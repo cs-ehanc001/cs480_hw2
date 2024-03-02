@@ -9,14 +9,20 @@ class Sudoku
 {
 private:
 
-  std::array<char, 81> m_data;
+  std::array<char, 81> m_data {};
 
 public:
 
   constexpr static inline std::array
     charset {'1', '2', '3', '4', '5', '6', '7', '8', '9', '_'};
 
-  Sudoku() = delete;
+  // default constructor leaves board in invalid state
+  Sudoku() = default;
+
+  explicit Sudoku(const std::array<char, 81>& arg)
+      : m_data {arg}
+  { }
+
   Sudoku(const Sudoku&) noexcept = default;
   Sudoku(Sudoku&&) noexcept = default;
   auto operator=(const Sudoku&) noexcept -> Sudoku& = default;

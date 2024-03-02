@@ -4,7 +4,7 @@ function(register_test input_test_file test_name)
 
     add_executable(${test_name} ${input_test_file})
 
-    target_link_libraries(${test_name} PRIVATE common_properties supple::testing)
+    target_link_libraries(${test_name} PRIVATE common_properties supple::testing Game_and_Logic)
 
     target_include_directories(${test_name} PRIVATE ${TOP_DIR}/cpp/include/)
 
