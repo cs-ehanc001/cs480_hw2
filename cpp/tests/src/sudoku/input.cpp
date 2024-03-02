@@ -3,7 +3,7 @@
 
 #include "sudoku.hpp"
 
-int main()
+auto main() -> int
 {
   supl::test_results results;
 
