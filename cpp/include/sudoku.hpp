@@ -9,14 +9,18 @@
 
 class Sudoku
 {
+public:
+
+  using mdspan_t =
+    Kokkos::mdspan<char, Kokkos::extents<std::size_t, 9, 9>>;
+
 private:
 
   std::array<char, 81> m_data {};
 
   // using reference implementation of C++23 std::mdspan
   // backported for use in C++20
-  Kokkos::mdspan<char, Kokkos::extents<std::size_t, 9, 9>> m_data_view {
-    m_data.data()};
+  mdspan_t m_data_view {m_data.data()};
 
 public:
 
@@ -35,6 +39,11 @@ public:
   auto operator=(const Sudoku&) noexcept -> Sudoku& = default;
   auto operator=(Sudoku&&) noexcept -> Sudoku& = default;
   ~Sudoku() = default;
+
+  [[nodiscard]] auto data_view() -> mdspan_t
+  {
+    return m_data_view;
+  }
 
   friend inline auto operator<(const Sudoku& lhs, const Sudoku& rhs)
     -> bool
