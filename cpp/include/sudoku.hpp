@@ -11,6 +11,8 @@ class Sudoku
 {
 public:
 
+  // using reference implementation of C++23 std::mdspan
+  // backported for use in C++20
   using mdspan_t =
     Kokkos::mdspan<char, Kokkos::extents<std::size_t, 9, 9>>;
 
@@ -18,8 +20,6 @@ private:
 
   std::array<char, 81> m_data {};
 
-  // using reference implementation of C++23 std::mdspan
-  // backported for use in C++20
   mdspan_t m_data_view {m_data.data()};
 
 public:
