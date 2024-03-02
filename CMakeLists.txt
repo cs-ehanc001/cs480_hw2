@@ -38,11 +38,12 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_LIST_DIR}/external)
 find_package(supple REQUIRED)
+find_package(mdspan REQUIRED)
 
 add_library(common_properties INTERFACE)
 target_include_directories(common_properties
                            INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/cpp/include)
-target_link_libraries(common_properties INTERFACE compiler_flags supple::core)
+target_link_libraries(common_properties INTERFACE compiler_flags supple::core std::mdspan)
 target_compile_features(common_properties INTERFACE cxx_std_${USE_CXX_STD})
 
 if(COMPILE_TESTS)

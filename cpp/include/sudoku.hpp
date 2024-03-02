@@ -5,11 +5,18 @@
 
 #include <supl/utility.hpp>
 
+#include <mdspan/mdspan.hpp>
+
 class Sudoku
 {
 private:
 
   std::array<char, 81> m_data {};
+
+  // using reference implementation of C++23 std::mdspan
+  // backported for use in C++20
+  Kokkos::mdspan<char, Kokkos::extents<std::size_t, 9, 9>> m_data_view {
+    m_data.data()};
 
 public:
 
@@ -29,7 +36,17 @@ public:
   auto operator=(Sudoku&&) noexcept -> Sudoku& = default;
   ~Sudoku() = default;
 
-  friend inline auto operator<=>(const Sudoku&, const Sudoku&) = default;
+  friend inline auto operator<(const Sudoku& lhs, const Sudoku& rhs)
+    -> bool
+  {
+    return lhs.m_data < rhs.m_data;
+  }
+
+  friend inline auto operator==(const Sudoku& lhs, const Sudoku& rhs)
+    -> bool
+  {
+    return lhs.m_data == rhs.m_data;
+  }
 
   friend auto operator>>(std::istream& in, Sudoku& rhs) -> std::istream&;
 
