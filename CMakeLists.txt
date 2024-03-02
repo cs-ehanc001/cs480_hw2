@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16.0)
 
 project(
-  placeholder_name
+  sudoku_solver
   VERSION 0.0.1
   LANGUAGES CXX)
 
@@ -10,7 +10,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(compiler_flags)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(USE_CXX_STD 17)
+set(USE_CXX_STD 20)
 
 if(NOT DEFINED CMAKE_BUILD_TYPE)
   message(FATAL_ERROR "Build type not specified!")
