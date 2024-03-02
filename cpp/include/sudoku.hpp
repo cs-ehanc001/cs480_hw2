@@ -13,14 +13,10 @@ public:
 
   // using reference implementation of C++23 std::mdspan
   // backported for use in C++20
-  using mdspan_t =
-    Kokkos::mdspan<char, Kokkos::extents<std::size_t, 9, 9>>;
 
 private:
 
   std::array<char, 81> m_data {};
-
-  mdspan_t m_data_view {m_data.data()};
 
 public:
 
@@ -40,27 +36,64 @@ public:
   auto operator=(Sudoku&&) noexcept -> Sudoku& = default;
   ~Sudoku() = default;
 
-  [[nodiscard]] auto data_view() -> mdspan_t
+  [[nodiscard]] auto is_solved() const -> bool;
+
+  [[nodiscard]] auto data() const -> const std::array<char, 81>&
   {
-    return m_data_view;
+    return m_data;
   }
 
-  friend inline auto operator<(const Sudoku& lhs, const Sudoku& rhs)
-    -> bool
+  [[nodiscard]] auto data() -> std::array<char, 81>&
   {
-    return lhs.m_data < rhs.m_data;
+    return m_data;
   }
 
-  friend inline auto operator==(const Sudoku& lhs, const Sudoku& rhs)
-    -> bool
+  [[nodiscard]] auto mdview()
   {
-    return lhs.m_data == rhs.m_data;
+    return Kokkos::mdspan<char, Kokkos::extents<std::size_t, 9, 9>> {
+      m_data.data()};
   }
 
-  friend auto operator>>(std::istream& in, Sudoku& rhs) -> std::istream&;
+  [[nodiscard]] auto mdview() const
+  {
+    return Kokkos::mdspan<const char, Kokkos::extents<std::size_t, 9, 9>> {
+      m_data.data()};
+  }
 
-  friend auto operator<<(std::ostream& out, const Sudoku& rhs)
-    -> std::ostream&;
+  friend auto operator<=>(const Sudoku& lhs, const Sudoku& rhs) = default;
+
+  friend inline auto operator>>(std::istream& in, Sudoku& rhs)
+    -> std::istream&
+  {
+    std::copy_n(std::istream_iterator<char> {in}, 81, rhs.m_data.begin());
+    return in;
+  }
+
+  friend inline auto operator<<(std::ostream& out, const Sudoku& rhs)
+    -> std::ostream&
+  {
+
+    std::string output_buffer {
+      R"(
+X X X | X X X | X X X
+X X X | X X X | X X X
+X X X | X X X | X X X
+------+-------+------
+X X X | X X X | X X X
+X X X | X X X | X X X
+X X X | X X X | X X X
+------+-------+------
+X X X | X X X | X X X
+X X X | X X X | X X X
+X X X | X X X | X X X
+)"};
+
+    for ( const char elem : rhs.m_data ) {
+      output_buffer.at(output_buffer.find('X')) = elem;
+    }
+
+    return out << output_buffer;
+  }
 };
 
 #endif
