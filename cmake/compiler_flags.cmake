@@ -366,7 +366,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL
 
 endif()
 
-# Use clang-tidy if not an automated build by cmake-all.sh
+# Use clang-tidy
 if(DO_CLANG_TIDY)
   message(STATUS "Using clang-tidy")
   set(CMAKE_CXX_CLANG_TIDY

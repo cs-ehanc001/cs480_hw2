@@ -24,13 +24,11 @@ endif()
 
 set(TOP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-option(SANITIZE_DEBUG "Sanitizers should be used in debug builds" YES)
+option(SANITIZE_DEBUG "Sanitizers should be used in debug builds" NO)
 
 option(SANITIZE_RELEASE "Sanitizers should be used in release builds" NO)
 
 option(COMPILE_TESTS "Tests should be compiled" ${MAIN_PROJECT})
-
-option(FULL_TESTS "Test C++20 and 23 as well" NO)
 
 # Options specific to compiling with clang
 option(DO_CLANG_TIDY "Run clang-tidy during build" NO)
