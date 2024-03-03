@@ -36,40 +36,42 @@ public:
   auto operator=(Sudoku&&) noexcept -> Sudoku& = default;
   ~Sudoku() = default;
 
-  [[nodiscard]] auto is_solved() const -> bool;
+  [[nodiscard]] auto is_solved() const noexcept -> bool;
 
-  [[nodiscard]] auto data() const -> const std::array<char, 81>&
+  [[nodiscard]] auto data() const noexcept -> const std::array<char, 81>&
   {
     return m_data;
   }
 
-  [[nodiscard]] auto data() -> std::array<char, 81>&
+  [[nodiscard]] auto data() noexcept -> std::array<char, 81>&
   {
     return m_data;
   }
 
-  [[nodiscard]] auto mdview()
+  [[nodiscard]] auto mdview() noexcept
   {
     return Kokkos::mdspan<char, Kokkos::extents<std::size_t, 9, 9>> {
       m_data.data()};
   }
 
-  [[nodiscard]] auto mdview() const
+  [[nodiscard]] auto mdview() const noexcept
   {
     return Kokkos::mdspan<const char, Kokkos::extents<std::size_t, 9, 9>> {
       m_data.data()};
   }
 
-  friend auto operator<=>(const Sudoku& lhs, const Sudoku& rhs) = default;
+  friend auto operator<=>(const Sudoku& lhs,
+                          const Sudoku& rhs) noexcept = default;
 
-  friend inline auto operator>>(std::istream& in, Sudoku& rhs)
+  friend inline auto operator>>(std::istream& in, Sudoku& rhs) noexcept
     -> std::istream&
   {
     std::copy_n(std::istream_iterator<char> {in}, 81, rhs.m_data.begin());
     return in;
   }
 
-  friend inline auto operator<<(std::ostream& out, const Sudoku& rhs)
+  friend inline auto operator<<(std::ostream& out,
+                                const Sudoku& rhs) noexcept
     -> std::ostream&
   {
 
