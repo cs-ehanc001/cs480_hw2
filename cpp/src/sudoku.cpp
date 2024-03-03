@@ -34,38 +34,41 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
 
   std::array<bool, 9> check_table {};
 
-  // check rows
+  // returns true if iteration is ok (indeterminate for complete board)
+  // returns false if iteration is bad (definitively board is in illegal state)
+  auto row_col_check_iteration {[&](std::size_t row, std::size_t col) {
+    const auto idx {(data_view(row, col) - '0') - 1};
+
+    if ( idx == ('_' - '0' - 1) ) {
+      return true;
+    }
+
+    assert(supl::to_string(idx + 1)
+           == supl::to_string(data_view(row, col)));
+    assert(idx >= 0);
+    assert(idx <= 8);
+
+    if ( bool& check_table_entry =
+           check_table.at(static_cast<std::size_t>(idx));
+         check_table_entry ) {
+      return false;
+    } else {
+      check_table_entry = true;
+    }
+
+    return true;
+  }};
+
+  // check row-wise
   for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
     for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
-      const auto idx {(data_view(row, col) - '0') - 1};
-
-      if ( idx == ('_' - '0' - 1) ) {
-        continue;
-      }
-
-      assert(supl::to_string(idx + 1)
-             == supl::to_string(data_view(row, col)));
-      assert(idx >= 0);
-      assert(idx <= 8);
-
-      if ( bool& check_table_entry =
-             check_table.at(static_cast<std::size_t>(idx));
-           check_table_entry ) {
+      if ( ! row_col_check_iteration(row, col) ) {
         return false;
-      } else {
-        check_table_entry = true;
       }
     }
 
     std::ranges::fill(check_table, false);
   }
-
-  // check columns
-
-  // factor out logic to be less repetitive??
-  // Literally just swapping outer and inner in the data_view access
-
-  // check 3x3 sections
 
   return true;
 }

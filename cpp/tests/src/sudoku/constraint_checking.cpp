@@ -9,7 +9,7 @@
 
 using namespace supl::literals::size_t_literal;
 
-static auto test_row_checking() -> supl::test_results
+static auto test_row_checking_of_populated_board() -> supl::test_results
 {
   supl::test_results results;
 
@@ -53,7 +53,8 @@ static auto constraint_checking() -> supl::test_section
 {
   supl::test_section section;
 
-  section.add_test("Sudoku row-wise checking", &test_row_checking);
+  section.add_test("Sudoku row-wise checking of populated board",
+                   &test_row_checking_of_populated_board);
 
   return section;
 }
