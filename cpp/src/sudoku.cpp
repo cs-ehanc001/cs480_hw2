@@ -70,6 +70,17 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
     std::ranges::fill(check_table, false);
   }
 
+  // check column-wise
+  for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
+    for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
+      if ( ! row_col_check_iteration(row, col) ) {
+        return false;
+      }
+    }
+
+    std::ranges::fill(check_table, false);
+  }
+
   return true;
 }
 

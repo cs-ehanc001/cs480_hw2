@@ -1,7 +1,9 @@
+#include <cstddef>
 #include <ranges>
 
 #include <supl/utility.hpp>
 
+#include <supl/test_results.hpp>
 #include <supl/test_runner.hpp>
 #include <supl/test_section.hpp>
 
@@ -45,6 +47,29 @@ static auto test_checking_of_populated_board() -> supl::test_results
       results.enforce_false(illegal.is_solved());
     }
   }
+
+  return results;
+}
+
+static auto test_row_violation_in_partial_board() -> supl::test_results
+{
+  supl::test_results results;
+
+  const Sudoku legal_partial {
+    {
+     // clang-format off
+  '_', '9', '_', '_', '_', '6', '_', '4', '_',
+  '_', '_', '5', '3', '_', '_', '_', '_', '8',
+  '_', '_', '_', '_', '7', '_', '2', '_', '_',
+  '_', '_', '1', '_', '5', '_', '_', '_', '3',
+  '_', '6', '_', '_', '_', '9', '_', '7', '_',
+  '2', '_', '_', '_', '8', '4', '1', '_', '_',
+  '_', '_', '3', '_', '1', '_', '_', '_', '_',
+  '8', '_', '_', '_', '_', '2', '5', '_', '_',
+  '_', '5', '_', '4', '_', '_', '_', '8', '_'
+     // clang-format on
+    }
+  };
 
   return results;
 }
