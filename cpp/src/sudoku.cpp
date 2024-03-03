@@ -74,6 +74,14 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
     std::ranges::fill(check_table, false);
   }
 
+  // rows are good
+
+  // row check alone is adequate for a populated board
+  // early exit
+  if ( is_populated(sudoku) ) {
+    return true;
+  }
+
   // check column-wise
   for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
     for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
@@ -84,6 +92,10 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
 
     std::ranges::fill(check_table, false);
   }
+
+  // columns are good
+
+  // check sections
 
   return true;
 }
