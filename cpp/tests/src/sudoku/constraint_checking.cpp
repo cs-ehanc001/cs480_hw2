@@ -84,12 +84,12 @@ static auto test_row_violation_in_partial_board() -> supl::test_results
     {0, 0, '1',  true, "0 0 1"},
     {0, 0, '3',  true, "0 0 3"},
     {0, 0, '6', false, "0 0 6"},
-    {3, 4, '6', false, "3 4 6"},
-    {3, 4, '1',  true, "3 4 1"},
-    {3, 4, '2',  true, "3 4 2"},
-    {3, 4, '7', false, "3 4 7"},
-    {6, 8, '4', false, "6 8 4"},
-    {6, 8, '9',  true, "6 8 9"}
+    {4, 3, '6', false, "3 4 6"},
+    {4, 3, '1',  true, "3 4 1"},
+    {4, 3, '2',  true, "3 4 2"},
+    {4, 3, '7', false, "3 4 7"},
+    {8, 6, '4', false, "6 8 4"},
+    {8, 6, '9',  true, "6 8 9"}
   };
 
   std::ranges::for_each(runs, [&](const run_data& data) {

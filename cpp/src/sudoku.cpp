@@ -48,6 +48,10 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
     assert(idx >= 0);
     assert(idx <= 8);
 
+    /* std::cout << sudoku << '\n'; */
+
+    /* std::cout << supl::stream_adapter{std::tuple{row, col, check_table, idx, check_table.at(idx)}} << '\n'; */
+
     if ( bool& check_table_entry =
            check_table.at(static_cast<std::size_t>(idx));
          check_table_entry ) {
