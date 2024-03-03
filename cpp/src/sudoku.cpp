@@ -89,3 +89,7 @@ auto Sudoku::is_solved() const noexcept -> bool
   return is_populated(*this) && is_legal_state(*this);
 }
 
+auto Sudoku::is_valid() const noexcept -> bool
+{
+  return is_legal_state(*this);
+}

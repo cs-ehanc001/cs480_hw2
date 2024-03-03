@@ -38,6 +38,8 @@ public:
 
   [[nodiscard]] auto is_solved() const noexcept -> bool;
 
+  [[nodiscard]] auto is_valid() const noexcept -> bool;
+
   [[nodiscard]] auto data() const noexcept -> const std::array<char, 81>&
   {
     return m_data;

@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <ranges>
+#include <string_view>
 
 #include <supl/utility.hpp>
 
@@ -51,6 +52,14 @@ static auto test_checking_of_populated_board() -> supl::test_results
   return results;
 }
 
+struct run_data {
+  std::size_t row;
+  std::size_t col;
+  char cell_to;
+  bool valid;
+  std::string_view message;
+};
+
 static auto test_row_violation_in_partial_board() -> supl::test_results
 {
   supl::test_results results;
@@ -71,6 +80,25 @@ static auto test_row_violation_in_partial_board() -> supl::test_results
     }
   };
 
+  std::vector<run_data> runs {
+    {0, 0, '1',  true, "0 0 1"},
+    {0, 0, '3',  true, "0 0 3"},
+    {0, 0, '6', false, "0 0 6"},
+    {3, 4, '6', false, "3 4 6"},
+    {3, 4, '1',  true, "3 4 1"},
+    {3, 4, '2',  true, "3 4 2"},
+    {3, 4, '7', false, "3 4 7"},
+    {6, 8, '4', false, "6 8 4"},
+    {6, 8, '9',  true, "6 8 9"}
+  };
+
+  std::ranges::for_each(runs, [&](const run_data& data) {
+    Sudoku test_partial {legal_partial};
+    const auto& [row, col, cell_to, valid, message] {data};
+    test_partial.mdview()(row, col) = cell_to;
+    results.enforce_equal(test_partial.is_valid(), valid, message);
+  });
+
   return results;
 }
 
@@ -80,6 +108,8 @@ static auto constraint_checking() -> supl::test_section
 
   section.add_test("Sudoku checking of populated board",
                    &test_checking_of_populated_board);
+  section.add_test("Row checking partial board",
+                   &test_row_violation_in_partial_board);
 
   return section;
 }
