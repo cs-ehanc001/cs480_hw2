@@ -43,22 +43,14 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
         continue;
       }
 
-      std::cout << supl::stream_adapter{
-        std::tuple {row, col, idx, data_view(row, col)}}
-                << std::endl;
-
       assert(supl::to_string(idx + 1)
              == supl::to_string(data_view(row, col)));
-
-      std::cout << supl::stream_adapter {check_table} << std::endl;
-
       assert(idx >= 0);
       assert(idx <= 8);
 
       if ( bool& check_table_entry =
              check_table.at(static_cast<std::size_t>(idx));
            check_table_entry ) {
-        std::cout << "BAD" << std::endl;
         return false;
       } else {
         check_table_entry = true;

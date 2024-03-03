@@ -9,7 +9,7 @@
 
 using namespace supl::literals::size_t_literal;
 
-static auto test_checking() -> supl::test_results
+static auto test_row_checking() -> supl::test_results
 {
   supl::test_results results;
 
@@ -42,9 +42,6 @@ static auto test_checking() -> supl::test_results
         fail_point = '1';
       }
 
-      std::cout << "Checking board with cell changed at: " << supl::stream_adapter{std::pair{row, col}}
-      << '\n' << legal << illegal << std::endl;
-
       results.enforce_false(illegal.is_solved());
     }
   }
@@ -56,7 +53,7 @@ static auto constraint_checking() -> supl::test_section
 {
   supl::test_section section;
 
-  section.add_test("Sudoku column checking", &test_checking);
+  section.add_test("Sudoku row-wise checking", &test_row_checking);
 
   return section;
 }
