@@ -114,7 +114,7 @@ static auto test_row_violation_in_partial_board() -> supl::test_results
   return results;
 }
 
-static auto test_col_violation_in_partial_board() -> supl::test_results
+static auto test_column_violation_in_partial_board() -> supl::test_results
 {
   supl::test_results results;
 
@@ -137,6 +137,29 @@ static auto test_col_violation_in_partial_board() -> supl::test_results
   return results;
 }
 
+static auto test_section_violation_in_partial_board() -> supl::test_results
+{
+  supl::test_results results;
+
+  std::vector<run_data> runs {
+    {0, 0, '1',  true},
+    {0, 0, '3',  true},
+    {0, 0, '5', false},
+    {4, 3, '5', false},
+    {4, 3, '1',  true},
+    {4, 3, '2',  true},
+    {6, 6, '8', false},
+    {0, 6, '8', false},
+    {8, 6, '9',  true}
+  };
+
+  std::ranges::for_each(runs, [&](const run_data& data) {
+    run_check(data, get_legal_partial(), results);
+  });
+
+  return results;
+}
+
 static auto constraint_checking() -> supl::test_section
 {
   supl::test_section section;
@@ -146,7 +169,9 @@ static auto constraint_checking() -> supl::test_section
   section.add_test("Row checking partial board",
                    &test_row_violation_in_partial_board);
   section.add_test("Column checking partial board",
-                   &test_col_violation_in_partial_board);
+                   &test_column_violation_in_partial_board);
+  section.add_test("Section checking partial board",
+                   &test_section_violation_in_partial_board);
 
   return section;
 }
