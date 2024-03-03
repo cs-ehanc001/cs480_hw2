@@ -60,6 +60,16 @@ struct run_data {
   bool valid;
 };
 
+static void
+run_check(const run_data& data, Sudoku board, supl::test_results& results)
+{
+  const auto& [row, col, cell_to, valid] {data};
+  board.mdview()(row, col) = cell_to;
+  results.enforce_equal(board.is_valid(),
+                        valid,
+                        supl::to_string(std::tuple {row, col, cell_to}));
+}
+
 static auto test_row_violation_in_partial_board() -> supl::test_results
 {
   supl::test_results results;
@@ -93,12 +103,7 @@ static auto test_row_violation_in_partial_board() -> supl::test_results
   };
 
   std::ranges::for_each(runs, [&](const run_data& data) {
-    Sudoku test_partial {legal_partial};
-    const auto& [row, col, cell_to, valid] {data};
-    test_partial.mdview()(row, col) = cell_to;
-    results.enforce_equal(test_partial.is_valid(),
-                          valid,
-                          supl::to_string(std::tuple {row, col, cell_to}));
+    run_check(data, legal_partial, results);
   });
 
   return results;
@@ -137,13 +142,7 @@ static auto test_col_violation_in_partial_board() -> supl::test_results
   };
 
   std::ranges::for_each(runs, [&](const run_data& data) {
-    Sudoku test_partial {legal_partial};
-    const auto& [row, col, cell_to, valid] {data};
-    test_partial.mdview()(row, col) = cell_to;
-
-    results.enforce_equal(test_partial.is_valid(),
-                          valid,
-                          supl::to_string(std::tuple {row, col, cell_to}));
+    run_check(data, legal_partial, results);
   });
 
   return results;
