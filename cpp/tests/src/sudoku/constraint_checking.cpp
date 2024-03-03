@@ -70,11 +70,9 @@ run_check(const run_data& data, Sudoku board, supl::test_results& results)
                         supl::to_string(std::tuple {row, col, cell_to}));
 }
 
-static auto test_row_violation_in_partial_board() -> supl::test_results
+static auto get_legal_partial() -> const Sudoku&
 {
-  supl::test_results results;
-
-  const Sudoku legal_partial {
+  static const Sudoku legal_partial {
     {
      // clang-format off
   '_', '9', '_', '_', '_', '6', '_', '4', '_',
@@ -89,6 +87,13 @@ static auto test_row_violation_in_partial_board() -> supl::test_results
      // clang-format on
     }
   };
+
+  return legal_partial;
+}
+
+static auto test_row_violation_in_partial_board() -> supl::test_results
+{
+  supl::test_results results;
 
   std::vector<run_data> runs {
     {0, 0, '1',  true},
@@ -103,7 +108,7 @@ static auto test_row_violation_in_partial_board() -> supl::test_results
   };
 
   std::ranges::for_each(runs, [&](const run_data& data) {
-    run_check(data, legal_partial, results);
+    run_check(data, get_legal_partial(), results);
   });
 
   return results;
@@ -112,22 +117,6 @@ static auto test_row_violation_in_partial_board() -> supl::test_results
 static auto test_col_violation_in_partial_board() -> supl::test_results
 {
   supl::test_results results;
-
-  const Sudoku legal_partial {
-    {
-     // clang-format off
-  '_', '9', '_', '_', '_', '6', '_', '4', '_',
-  '_', '_', '5', '3', '_', '_', '_', '_', '8',
-  '_', '_', '_', '_', '7', '_', '2', '_', '_',
-  '_', '_', '1', '_', '5', '_', '_', '_', '3',
-  '_', '6', '_', '_', '_', '9', '_', '7', '_',
-  '2', '_', '_', '_', '8', '4', '1', '_', '_',
-  '_', '_', '3', '_', '1', '_', '_', '_', '_',
-  '8', '_', '_', '_', '_', '2', '5', '_', '_',
-  '_', '5', '_', '4', '_', '_', '_', '8', '_'
-     // clang-format on
-    }
-  };
 
   std::vector<run_data> runs {
     {0, 0, '1',  true},
@@ -142,7 +131,7 @@ static auto test_col_violation_in_partial_board() -> supl::test_results
   };
 
   std::ranges::for_each(runs, [&](const run_data& data) {
-    run_check(data, legal_partial, results);
+    run_check(data, get_legal_partial(), results);
   });
 
   return results;
