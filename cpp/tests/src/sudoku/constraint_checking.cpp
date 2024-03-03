@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <ranges>
+#include <sstream>
 #include <string_view>
 
 #include <supl/utility.hpp>
@@ -57,7 +58,6 @@ struct run_data {
   std::size_t col;
   char cell_to;
   bool valid;
-  std::string_view message;
 };
 
 static auto test_row_violation_in_partial_board() -> supl::test_results
@@ -81,22 +81,69 @@ static auto test_row_violation_in_partial_board() -> supl::test_results
   };
 
   std::vector<run_data> runs {
-    {0, 0, '1',  true, "0 0 1"},
-    {0, 0, '3',  true, "0 0 3"},
-    {0, 0, '6', false, "0 0 6"},
-    {4, 3, '6', false, "3 4 6"},
-    {4, 3, '1',  true, "3 4 1"},
-    {4, 3, '2',  true, "3 4 2"},
-    {4, 3, '7', false, "3 4 7"},
-    {8, 6, '4', false, "6 8 4"},
-    {8, 6, '9',  true, "6 8 9"}
+    {0, 0, '1',  true},
+    {0, 0, '3',  true},
+    {0, 0, '6', false},
+    {4, 3, '6', false},
+    {4, 3, '1',  true},
+    {4, 3, '2',  true},
+    {4, 3, '7', false},
+    {8, 6, '4', false},
+    {8, 6, '9',  true}
   };
 
   std::ranges::for_each(runs, [&](const run_data& data) {
     Sudoku test_partial {legal_partial};
-    const auto& [row, col, cell_to, valid, message] {data};
+    const auto& [row, col, cell_to, valid] {data};
     test_partial.mdview()(row, col) = cell_to;
-    results.enforce_equal(test_partial.is_valid(), valid, message);
+    results.enforce_equal(test_partial.is_valid(),
+                          valid,
+                          supl::to_string(std::tuple {row, col, cell_to}));
+  });
+
+  return results;
+}
+
+static auto test_col_violation_in_partial_board() -> supl::test_results
+{
+  supl::test_results results;
+
+  const Sudoku legal_partial {
+    {
+     // clang-format off
+  '_', '9', '_', '_', '_', '6', '_', '4', '_',
+  '_', '_', '5', '3', '_', '_', '_', '_', '8',
+  '_', '_', '_', '_', '7', '_', '2', '_', '_',
+  '_', '_', '1', '_', '5', '_', '_', '_', '3',
+  '_', '6', '_', '_', '_', '9', '_', '7', '_',
+  '2', '_', '_', '_', '8', '4', '1', '_', '_',
+  '_', '_', '3', '_', '1', '_', '_', '_', '_',
+  '8', '_', '_', '_', '_', '2', '5', '_', '_',
+  '_', '5', '_', '4', '_', '_', '_', '8', '_'
+     // clang-format on
+    }
+  };
+
+  std::vector<run_data> runs {
+    {0, 0, '1',  true},
+    {0, 0, '3',  true},
+    {0, 0, '2', false},
+    {4, 3, '3', false},
+    {4, 3, '1',  true},
+    {4, 3, '2',  true},
+    {6, 6, '2', false},
+    {8, 6, '4', false},
+    {8, 6, '9',  true}
+  };
+
+  std::ranges::for_each(runs, [&](const run_data& data) {
+    Sudoku test_partial {legal_partial};
+    const auto& [row, col, cell_to, valid] {data};
+    test_partial.mdview()(row, col) = cell_to;
+
+    results.enforce_equal(test_partial.is_valid(),
+                          valid,
+                          supl::to_string(std::tuple {row, col, cell_to}));
   });
 
   return results;
@@ -110,6 +157,8 @@ static auto constraint_checking() -> supl::test_section
                    &test_checking_of_populated_board);
   section.add_test("Row checking partial board",
                    &test_row_violation_in_partial_board);
+  section.add_test("Column checking partial board",
+                   &test_col_violation_in_partial_board);
 
   return section;
 }
