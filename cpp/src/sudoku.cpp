@@ -37,7 +37,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
 
   // returns true if iteration is ok (indeterminate for complete board)
   // returns false if iteration is bad (definitively board is in illegal state)
-  auto row_col_check_iteration {[&](const char cell) {
+  auto check_iteration {[&](const char cell) {
     const auto idx {(cell - '0') - 1};
 
     if ( idx == ('_' - '0' - 1) ) {
@@ -67,7 +67,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
 
   for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
     for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
-      if ( ! row_col_check_iteration(data_view(row, col)) ) {
+      if ( ! check_iteration(data_view(row, col)) ) {
         return false;
       }
     }
@@ -86,7 +86,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
   // check column-wise
   for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
     for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
-      if ( ! row_col_check_iteration(data_view(row, col)) ) {
+      if ( ! check_iteration(data_view(row, col)) ) {
         return false;
       }
     }
@@ -200,8 +200,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
 
   for ( const auto& section : section_table ) {
     for ( const auto& [row, col] : section ) {
-      if ( const bool ok_so_far {
-             row_col_check_iteration(data_view(row, col))};
+      if ( const bool ok_so_far {check_iteration(data_view(row, col))};
            ! ok_so_far ) {
         return false;
       }

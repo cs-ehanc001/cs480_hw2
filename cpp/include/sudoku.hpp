@@ -64,25 +64,25 @@ public:
       m_data.data()};
   }
 
-  template <typename Func>
-  void for_each_in_row(const std::size_t row, Func&& func) noexcept
-  {
-    using namespace supl::literals::size_t_literal;
-    const auto data_view {this->mdview()};
-    for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
-      std::forward<Func>(func)(data_view(row, col));
-    }
-  }
+  /* template <typename Func> */
+  /* void for_each_in_row(const std::size_t row, Func&& func) noexcept */
+  /* { */
+  /*   using namespace supl::literals::size_t_literal; */
+  /*   const auto data_view {this->mdview()}; */
+  /*   for ( const std::size_t col : std::views::iota(0_z, 9_z) ) { */
+  /*     std::forward<Func>(func)(data_view(row, col)); */
+  /*   } */
+  /* } */
 
-  template <typename Func>
-  void for_each_in_col(const std::size_t col, Func&& func) noexcept
-  {
-    using namespace supl::literals::size_t_literal;
-    const auto data_view {this->mdview()};
-    for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
-      std::forward<Func>(func)(data_view(row, col));
-    }
-  }
+  /* template <typename Func> */
+  /* void for_each_in_col(const std::size_t col, Func&& func) noexcept */
+  /* { */
+  /*   using namespace supl::literals::size_t_literal; */
+  /*   const auto data_view {this->mdview()}; */
+  /*   for ( const std::size_t row : std::views::iota(0_z, 9_z) ) { */
+  /*     std::forward<Func>(func)(data_view(row, col)); */
+  /*   } */
+  /* } */
 
   friend auto operator<=>(const Sudoku& lhs,
                           const Sudoku& rhs) noexcept = default;
