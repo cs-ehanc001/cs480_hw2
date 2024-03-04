@@ -114,12 +114,56 @@ static auto test_trivial_column_moves() -> supl::test_results
   return results;
 }
 
+static auto test_trivial_section_moves() -> supl::test_results
+{
+  supl::test_results results;
+
+  Sudoku trivial_section_moves {
+    {
+     // clang-format off
+  '1', '9', '8', '5', '_', '6', '_', '4', '7',
+  '7', '_', '5', '3', '4', '1', '6', '9', '8',
+  '3', '4', '6', '9', '7', '8', '2', '1', '5',
+  '9', '8', '1', '2', '_', '7', '4', '6', '3',
+  '5', '6', '4', '1', '3', '9', '8', '7', '2',
+  '2', '3', '7', '6', '8', '4', '1', '5', '9',
+  '4', '_', '3', '8', '_', '5', '9', '2', '6',
+  '8', '1', '9', '7', '6', '2', '_', '_', '4',
+  '6', '5', '2', '4', '9', '3', '7', '8', '1'
+     // clang-format on
+    }
+  };
+
+  for ( [[maybe_unused]] const int _ : std::views::iota(0, 7) ) {
+    results.enforce_true(
+      trivial_section_moves.apply_trivial_section_move());
+  }
+
+  results.enforce_false(
+    trivial_section_moves.apply_trivial_section_move());
+  results.enforce_false(
+    trivial_section_moves.apply_trivial_section_move());
+  results.enforce_true(trivial_section_moves.is_valid());
+  results.enforce_false(trivial_section_moves.is_solved());
+
+  const Sudoku expected_result {{
+    // clang-format off
+    // clang-format on
+  }};
+
+  const Sudoku& result = trivial_section_moves;
+  results.enforce_equal(result, expected_result);
+
+  return results;
+}
+
 static auto trivial_moves() -> supl::test_section
 {
   supl::test_section section;
 
   section.add_test("Trivial row moves", &test_trivial_row_moves);
   section.add_test("Trivial column moves", &test_trivial_column_moves);
+  section.add_test("Trivial section moves", &test_trivial_section_moves);
 
   return section;
 }
