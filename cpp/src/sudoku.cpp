@@ -105,7 +105,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
   // ^ all sections
   constexpr static std::array section_table {
   // {{{
-  // section 1,1
+  // section 0,0
     std::array {std::pair {0_z, 0_z},
                 std::pair {0_z, 1_z},
                 std::pair {0_z, 2_z},
@@ -115,7 +115,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
                 std::pair {2_z, 0_z},
                 std::pair {2_z, 1_z},
                 std::pair {2_z, 2_z}},
- // section 1,2
+ // section 0,1
     std::array {std::pair {0_z, 3_z},
                 std::pair {0_z, 4_z},
                 std::pair {0_z, 5_z},
@@ -125,7 +125,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
                 std::pair {2_z, 3_z},
                 std::pair {2_z, 4_z},
                 std::pair {2_z, 5_z}},
- // section 1,3
+ // section 0,2
     std::array {std::pair {0_z, 6_z},
                 std::pair {0_z, 7_z},
                 std::pair {0_z, 8_z},
@@ -135,7 +135,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
                 std::pair {2_z, 6_z},
                 std::pair {2_z, 7_z},
                 std::pair {2_z, 8_z}},
- // section 2,1
+ // section 1,0
     std::array {std::pair {3_z, 0_z},
                 std::pair {3_z, 1_z},
                 std::pair {3_z, 2_z},
@@ -145,7 +145,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
                 std::pair {5_z, 0_z},
                 std::pair {5_z, 1_z},
                 std::pair {5_z, 2_z}},
- // section 2,2
+ // section 1,1
     std::array {std::pair {3_z, 3_z},
                 std::pair {3_z, 4_z},
                 std::pair {3_z, 5_z},
@@ -155,7 +155,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
                 std::pair {5_z, 3_z},
                 std::pair {5_z, 4_z},
                 std::pair {5_z, 5_z}},
- // section 2,3
+ // section 1,2
     std::array {std::pair {3_z, 6_z},
                 std::pair {3_z, 7_z},
                 std::pair {3_z, 8_z},
@@ -165,7 +165,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
                 std::pair {5_z, 6_z},
                 std::pair {5_z, 7_z},
                 std::pair {5_z, 8_z}},
- // section 3,1
+ // section 2,0
     std::array {std::pair {6_z, 0_z},
                 std::pair {6_z, 1_z},
                 std::pair {6_z, 2_z},
@@ -175,7 +175,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
                 std::pair {8_z, 0_z},
                 std::pair {8_z, 1_z},
                 std::pair {8_z, 2_z}},
- // section 3,2
+ // section 2,1
     std::array {std::pair {6_z, 3_z},
                 std::pair {6_z, 4_z},
                 std::pair {6_z, 5_z},
@@ -185,7 +185,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
                 std::pair {8_z, 3_z},
                 std::pair {8_z, 4_z},
                 std::pair {8_z, 5_z}},
- // section 3,3
+ // section 2,2
     std::array {std::pair {6_z, 6_z},
                 std::pair {6_z, 7_z},
                 std::pair {6_z, 8_z},
@@ -200,7 +200,8 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
 
   for ( const auto& section : section_table ) {
     for ( const auto& [row, col] : section ) {
-      if ( ! row_col_check_iteration(row, col) ) {
+      if ( const bool ok_so_far {row_col_check_iteration(row, col)};
+           ! ok_so_far ) {
         return false;
       }
     }

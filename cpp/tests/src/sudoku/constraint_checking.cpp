@@ -144,13 +144,19 @@ static auto test_section_violation_in_partial_board() -> supl::test_results
   std::vector<run_data> runs {
     {0, 0, '1',  true},
     {0, 0, '3',  true},
-    {0, 0, '5', false},
     {4, 3, '5', false},
     {4, 3, '1',  true},
     {4, 3, '2',  true},
-    {6, 6, '8', false},
+    {8, 6, '9',  true},
+    {0, 0, '5', false},
+    {0, 3, '7', false},
     {0, 6, '8', false},
-    {8, 6, '9',  true}
+    {3, 0, '6', false},
+    {3, 3, '8', false},
+    {3, 6, '7', false},
+    {6, 0, '8', false},
+    {6, 3, '2', false},
+    {6, 6, '8', false},
   };
 
   std::ranges::for_each(runs, [&](const run_data& data) {
