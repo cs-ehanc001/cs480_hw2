@@ -1,9 +1,12 @@
 #ifndef SUDOKU_HPP
 #define SUDOKU_HPP
 
+#include <algorithm>
 #include <array>
-#include <ranges>
-#include <utility>
+#include <cstddef>
+#include <iostream>
+#include <iterator>
+#include <string>
 
 #include <supl/utility.hpp>
 
@@ -12,10 +15,6 @@
 class Sudoku
 {
 public:
-
-  // using reference implementation of C++23 std::mdspan
-  // backported for use in C++20
-
 private:
 
   std::array<char, 81> m_data {};
@@ -51,6 +50,16 @@ public:
   {
     return m_data;
   }
+
+  // Using reference implementation of C++23 std::mdspan (as Kokkos::mdspan)
+  // backported for use in C++20
+  // See https://www.wg21.link/P0009 for details
+  //
+  // In short, it is a non-owning view over contiguous data
+  // and provides multidimensional indexing
+  //
+  // It is used here to wrap the linear contiguous std::array<char, 81> m_data
+  // and index it similarly to as if it were a std::array<std::array, 9>, 9>
 
   [[nodiscard]] auto mdview() noexcept
   {
