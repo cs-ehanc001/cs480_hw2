@@ -236,9 +236,9 @@ auto Sudoku::apply_trivial_move() noexcept -> bool
     return true;
   }
 
-  /* if (this->apply_trivial_section_move()) { */
-  /*   return true; */
-  /* } */
+  if ( this->apply_trivial_section_move() ) {
+    return true;
+  }
 
   return false;
 }
