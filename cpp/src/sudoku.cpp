@@ -236,19 +236,22 @@ auto Sudoku::apply_trivial_move() noexcept -> bool
   // perform trivial move based on row constraints
   // (if one exists)
   for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
+    std::size_t trivial_move_idx {};
     for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
       const char cell {data_view(row, col)};
-      const auto idx {(cell - '0') - 1};
+      const auto population_table_idx {(cell - '0') - 1};
 
       // skip if unpopulated
-      if ( idx == ('_' - '0' - 1) ) {
+      if ( population_table_idx == ('_' - '0' - 1) ) {
+        trivial_move_idx = col;
         continue;
       }
 
-      assert(idx >= 0);
-      assert(idx <= 8);
+      assert(population_table_idx >= 0);
+      assert(population_table_idx <= 8);
 
-      population_table.at(static_cast<std::size_t>(idx)) = true;
+      population_table.at(static_cast<std::size_t>(population_table_idx)) =
+        true;
     }
 
     // if only one unpopulated cell in the row,
@@ -259,14 +262,10 @@ auto Sudoku::apply_trivial_move() noexcept -> bool
                - std::begin(population_table)
              >= 0);
 
-      const std::size_t trivial_move_idx {
-        static_cast<std::size_t>(std::ranges::find(population_table, false)
-                                 - std::begin(population_table))};
-
-      assert(trivial_move_idx <= 8);
-
       const char trivial_assignment_value {
-        static_cast<char>(trivial_move_idx + '0' + 1)};
+        static_cast<char>((std::ranges::find(population_table, false)
+                           - std::begin(population_table))
+                          + '0' + 1)};
 
       data_view(row, trivial_move_idx) = trivial_assignment_value;
       assert(this->is_valid());
