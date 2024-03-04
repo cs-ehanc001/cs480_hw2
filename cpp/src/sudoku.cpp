@@ -27,6 +27,106 @@ static auto is_uniformly_filled(Iter begin, Iter end, const T& value)
   return true;
 }
 
+// dirty indexing hack
+//       v each section
+// array<array<pair<index,index>>>
+//             ^ indices for each cell in the section
+// ^ all sections
+constexpr static std::array section_table {
+  // {{{
+  // section 0,0
+  std::array {std::pair {0_z, 0_z},
+              std::pair {0_z, 1_z},
+              std::pair {0_z, 2_z},
+              std::pair {1_z, 0_z},
+              std::pair {1_z, 1_z},
+              std::pair {1_z, 2_z},
+              std::pair {2_z, 0_z},
+              std::pair {2_z, 1_z},
+              std::pair {2_z, 2_z}},
+ // section 0,1
+  std::array {std::pair {0_z, 3_z},
+              std::pair {0_z, 4_z},
+              std::pair {0_z, 5_z},
+              std::pair {1_z, 3_z},
+              std::pair {1_z, 4_z},
+              std::pair {1_z, 5_z},
+              std::pair {2_z, 3_z},
+              std::pair {2_z, 4_z},
+              std::pair {2_z, 5_z}},
+ // section 0,2
+  std::array {std::pair {0_z, 6_z},
+              std::pair {0_z, 7_z},
+              std::pair {0_z, 8_z},
+              std::pair {1_z, 6_z},
+              std::pair {1_z, 7_z},
+              std::pair {1_z, 8_z},
+              std::pair {2_z, 6_z},
+              std::pair {2_z, 7_z},
+              std::pair {2_z, 8_z}},
+ // section 1,0
+  std::array {std::pair {3_z, 0_z},
+              std::pair {3_z, 1_z},
+              std::pair {3_z, 2_z},
+              std::pair {4_z, 0_z},
+              std::pair {4_z, 1_z},
+              std::pair {4_z, 2_z},
+              std::pair {5_z, 0_z},
+              std::pair {5_z, 1_z},
+              std::pair {5_z, 2_z}},
+ // section 1,1
+  std::array {std::pair {3_z, 3_z},
+              std::pair {3_z, 4_z},
+              std::pair {3_z, 5_z},
+              std::pair {4_z, 3_z},
+              std::pair {4_z, 4_z},
+              std::pair {4_z, 5_z},
+              std::pair {5_z, 3_z},
+              std::pair {5_z, 4_z},
+              std::pair {5_z, 5_z}},
+ // section 1,2
+  std::array {std::pair {3_z, 6_z},
+              std::pair {3_z, 7_z},
+              std::pair {3_z, 8_z},
+              std::pair {4_z, 6_z},
+              std::pair {4_z, 7_z},
+              std::pair {4_z, 8_z},
+              std::pair {5_z, 6_z},
+              std::pair {5_z, 7_z},
+              std::pair {5_z, 8_z}},
+ // section 2,0
+  std::array {std::pair {6_z, 0_z},
+              std::pair {6_z, 1_z},
+              std::pair {6_z, 2_z},
+              std::pair {7_z, 0_z},
+              std::pair {7_z, 1_z},
+              std::pair {7_z, 2_z},
+              std::pair {8_z, 0_z},
+              std::pair {8_z, 1_z},
+              std::pair {8_z, 2_z}},
+ // section 2,1
+  std::array {std::pair {6_z, 3_z},
+              std::pair {6_z, 4_z},
+              std::pair {6_z, 5_z},
+              std::pair {7_z, 3_z},
+              std::pair {7_z, 4_z},
+              std::pair {7_z, 5_z},
+              std::pair {8_z, 3_z},
+              std::pair {8_z, 4_z},
+              std::pair {8_z, 5_z}},
+ // section 2,2
+  std::array {std::pair {6_z, 6_z},
+              std::pair {6_z, 7_z},
+              std::pair {6_z, 8_z},
+              std::pair {7_z, 6_z},
+              std::pair {7_z, 7_z},
+              std::pair {7_z, 8_z},
+              std::pair {8_z, 6_z},
+              std::pair {8_z, 7_z},
+              std::pair {8_z, 8_z}},
+ // }}}
+};
+
 // Only determines if constraints are intact
 // A partially-filled board which does not violate constraints will return true
 static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
@@ -97,107 +197,6 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
   // columns are good
 
   // check sections
-
-  // dirty indexing hack
-  //       v each section
-  // array<array<pair<index,index>>>
-  //             ^ indices for each cell in the section
-  // ^ all sections
-  constexpr static std::array section_table {
-  // {{{
-  // section 0,0
-    std::array {std::pair {0_z, 0_z},
-                std::pair {0_z, 1_z},
-                std::pair {0_z, 2_z},
-                std::pair {1_z, 0_z},
-                std::pair {1_z, 1_z},
-                std::pair {1_z, 2_z},
-                std::pair {2_z, 0_z},
-                std::pair {2_z, 1_z},
-                std::pair {2_z, 2_z}},
- // section 0,1
-    std::array {std::pair {0_z, 3_z},
-                std::pair {0_z, 4_z},
-                std::pair {0_z, 5_z},
-                std::pair {1_z, 3_z},
-                std::pair {1_z, 4_z},
-                std::pair {1_z, 5_z},
-                std::pair {2_z, 3_z},
-                std::pair {2_z, 4_z},
-                std::pair {2_z, 5_z}},
- // section 0,2
-    std::array {std::pair {0_z, 6_z},
-                std::pair {0_z, 7_z},
-                std::pair {0_z, 8_z},
-                std::pair {1_z, 6_z},
-                std::pair {1_z, 7_z},
-                std::pair {1_z, 8_z},
-                std::pair {2_z, 6_z},
-                std::pair {2_z, 7_z},
-                std::pair {2_z, 8_z}},
- // section 1,0
-    std::array {std::pair {3_z, 0_z},
-                std::pair {3_z, 1_z},
-                std::pair {3_z, 2_z},
-                std::pair {4_z, 0_z},
-                std::pair {4_z, 1_z},
-                std::pair {4_z, 2_z},
-                std::pair {5_z, 0_z},
-                std::pair {5_z, 1_z},
-                std::pair {5_z, 2_z}},
- // section 1,1
-    std::array {std::pair {3_z, 3_z},
-                std::pair {3_z, 4_z},
-                std::pair {3_z, 5_z},
-                std::pair {4_z, 3_z},
-                std::pair {4_z, 4_z},
-                std::pair {4_z, 5_z},
-                std::pair {5_z, 3_z},
-                std::pair {5_z, 4_z},
-                std::pair {5_z, 5_z}},
- // section 1,2
-    std::array {std::pair {3_z, 6_z},
-                std::pair {3_z, 7_z},
-                std::pair {3_z, 8_z},
-                std::pair {4_z, 6_z},
-                std::pair {4_z, 7_z},
-                std::pair {4_z, 8_z},
-                std::pair {5_z, 6_z},
-                std::pair {5_z, 7_z},
-                std::pair {5_z, 8_z}},
- // section 2,0
-    std::array {std::pair {6_z, 0_z},
-                std::pair {6_z, 1_z},
-                std::pair {6_z, 2_z},
-                std::pair {7_z, 0_z},
-                std::pair {7_z, 1_z},
-                std::pair {7_z, 2_z},
-                std::pair {8_z, 0_z},
-                std::pair {8_z, 1_z},
-                std::pair {8_z, 2_z}},
- // section 2,1
-    std::array {std::pair {6_z, 3_z},
-                std::pair {6_z, 4_z},
-                std::pair {6_z, 5_z},
-                std::pair {7_z, 3_z},
-                std::pair {7_z, 4_z},
-                std::pair {7_z, 5_z},
-                std::pair {8_z, 3_z},
-                std::pair {8_z, 4_z},
-                std::pair {8_z, 5_z}},
- // section 2,2
-    std::array {std::pair {6_z, 6_z},
-                std::pair {6_z, 7_z},
-                std::pair {6_z, 8_z},
-                std::pair {7_z, 6_z},
-                std::pair {7_z, 7_z},
-                std::pair {7_z, 8_z},
-                std::pair {8_z, 6_z},
-                std::pair {8_z, 7_z},
-                std::pair {8_z, 8_z}},
-  };
-  // }}}
-
   for ( const auto& section : section_table ) {
     for ( const auto& [row, col] : section ) {
       if ( const bool ok_so_far {check_iteration(data_view(row, col))};
@@ -220,4 +219,57 @@ auto Sudoku::is_solved() const noexcept -> bool
 auto Sudoku::is_valid() const noexcept -> bool
 {
   return is_legal_state(*this);
+}
+
+// applies exactly one trivial move (only one possible value)
+// returned bool indicates whether an assignment was made
+//
+// below snippet would apply trivial moves until none remained
+// while(sudoku.apply_trivial_move());
+auto Sudoku::apply_trivial_move() noexcept -> bool
+{
+  auto data_view = this->mdview();
+
+  std::array<bool, 9> populated_table {};
+
+  // perform trivial move based on row constraints
+  // (if one exists)
+  for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
+    for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
+      const char cell {data_view(row, col)};
+      const auto idx {(cell - '0') - 1};
+
+      // skip if unpopulated
+      if ( idx == ('_' - '0' - 1) ) {
+        continue;
+      }
+
+      assert(idx >= 0);
+      assert(idx <= 8);
+
+      populated_table.at(static_cast<std::size_t>(idx)) = true;
+    }
+
+    // if only one unpopulated cell in the row,
+    // a trivial move exists
+    if ( std::ranges::count(populated_table, false) == 1 ) {
+
+      assert(std::ranges::find(populated_table, false)
+               - std::begin(populated_table)
+             >= 0);
+
+      const std::size_t trivial_move_idx {
+        static_cast<std::size_t>(std::ranges::find(populated_table, false)
+                                 - std::begin(populated_table))};
+
+      assert(trivial_move_idx >= 0);
+      assert(trivial_move_idx <= 8);
+
+      const char trivial_assignment_value {
+        static_cast<char>(trivial_move_idx + '0' + 1)};
+
+      data_view(row, trivial_move_idx) = trivial_assignment_value;
+      return true;
+    }
+  }
 }

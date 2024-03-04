@@ -64,6 +64,13 @@ public:
       m_data.data()};
   }
 
+  // apply a single trivial move (cardinality of reduced domain == 1)
+  // (i.e. 8/9 cells in a row are populated; populate last cell in the row
+  // with the single possibility)
+  //
+  // returns true if move was applied, returns false if no trivial move exists
+  auto apply_trivial_move() noexcept -> bool;
+
   /* template <typename Func> */
   /* void for_each_in_row(const std::size_t row, Func&& func) noexcept */
   /* { */

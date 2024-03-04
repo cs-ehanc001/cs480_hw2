@@ -1,6 +1,5 @@
 #include <cstddef>
 #include <ranges>
-#include <sstream>
 #include <string_view>
 
 #include <supl/utility.hpp>
