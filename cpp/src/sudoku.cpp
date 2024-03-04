@@ -228,9 +228,10 @@ auto Sudoku::is_valid() const noexcept -> bool
 // while(sudoku.apply_trivial_move());
 auto Sudoku::apply_trivial_move() noexcept -> bool
 {
+  assert(this->is_valid());
   auto data_view = this->mdview();
 
-  std::array<bool, 9> populated_table {};
+  std::array<bool, 9> population_table {};
 
   // perform trivial move based on row constraints
   // (if one exists)
@@ -247,29 +248,35 @@ auto Sudoku::apply_trivial_move() noexcept -> bool
       assert(idx >= 0);
       assert(idx <= 8);
 
-      populated_table.at(static_cast<std::size_t>(idx)) = true;
+      population_table.at(static_cast<std::size_t>(idx)) = true;
     }
 
     // if only one unpopulated cell in the row,
     // a trivial move exists
-    if ( std::ranges::count(populated_table, false) == 1 ) {
+    if ( std::ranges::count(population_table, false) == 1 ) {
 
-      assert(std::ranges::find(populated_table, false)
-               - std::begin(populated_table)
+      assert(std::ranges::find(population_table, false)
+               - std::begin(population_table)
              >= 0);
 
       const std::size_t trivial_move_idx {
-        static_cast<std::size_t>(std::ranges::find(populated_table, false)
-                                 - std::begin(populated_table))};
+        static_cast<std::size_t>(std::ranges::find(population_table, false)
+                                 - std::begin(population_table))};
 
-      assert(trivial_move_idx >= 0);
       assert(trivial_move_idx <= 8);
 
       const char trivial_assignment_value {
         static_cast<char>(trivial_move_idx + '0' + 1)};
 
       data_view(row, trivial_move_idx) = trivial_assignment_value;
+      assert(this->is_valid());
       return true;
     }
+
+    assert(this->is_valid());
+    std::ranges::fill(population_table, false);
   }
+
+  assert(this->is_valid());
+  return false;
 }
