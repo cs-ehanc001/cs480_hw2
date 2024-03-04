@@ -228,6 +228,24 @@ auto Sudoku::is_valid() const noexcept -> bool
 // while(sudoku.apply_trivial_move());
 auto Sudoku::apply_trivial_move() noexcept -> bool
 {
+  if ( this->apply_trivial_row_move() ) {
+    return true;
+  }
+
+  if ( this->apply_trivial_column_move() ) {
+    return true;
+  }
+
+  /* if (this->apply_trivial_section_move()) { */
+  /*   return true; */
+  /* } */
+
+  return false;
+}
+
+// apply only trivial move based on row constraints (mostly for testing purposes)
+auto Sudoku::apply_trivial_row_move() noexcept -> bool
+{
   assert(this->is_valid());
   auto data_view = this->mdview();
 
@@ -275,7 +293,62 @@ auto Sudoku::apply_trivial_move() noexcept -> bool
     assert(this->is_valid());
     std::ranges::fill(population_table, false);
   }
+}
+
+// apply only trivial move based on column constraints (mostly for testing purposes)
+auto Sudoku::apply_trivial_column_move() noexcept -> bool
+{
+  assert(this->is_valid());
+  auto data_view = this->mdview();
+
+  std::array<bool, 9> population_table {};
+
+  for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
+    std::size_t trivial_move_idx {};
+    for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
+      const char cell {data_view(row, col)};
+      const auto population_table_idx {(cell - '0') - 1};
+
+      // skip if unpopulated
+      if ( population_table_idx == ('_' - '0' - 1) ) {
+        trivial_move_idx = row;
+        continue;
+      }
+
+      assert(population_table_idx >= 0);
+      assert(population_table_idx <= 8);
+
+      population_table.at(static_cast<std::size_t>(population_table_idx)) =
+        true;
+    }
+
+    // if only one unpopulated cell in the row,
+    // a trivial move exists
+    if ( std::ranges::count(population_table, false) == 1 ) {
+
+      assert(std::ranges::find(population_table, false)
+               - std::begin(population_table)
+             >= 0);
+
+      const char trivial_assignment_value {
+        static_cast<char>((std::ranges::find(population_table, false)
+                           - std::begin(population_table))
+                          + '0' + 1)};
+
+      data_view(trivial_move_idx, col) = trivial_assignment_value;
+      assert(this->is_valid());
+      return true;
+    }
+
+    assert(this->is_valid());
+    std::ranges::fill(population_table, false);
+  }
 
   assert(this->is_valid());
   return false;
 }
+
+// apply only trivial move based on column constraints (mostly for testing purposes)
+/* auto Sudoku::apply_trivial_section_move() -> bool */
+/* { */
+/* } */

@@ -71,6 +71,15 @@ public:
   // returns true if move was applied, returns false if no trivial move exists
   auto apply_trivial_move() noexcept -> bool;
 
+  // apply only trivial move based on row constraints (mostly for testing purposes)
+  auto apply_trivial_row_move() noexcept -> bool;
+
+  // apply only trivial move based on column constraints (mostly for testing purposes)
+  auto apply_trivial_column_move() noexcept -> bool;
+
+  // apply only trivial move based on section constraints (mostly for testing purposes)
+  /* auto apply_trivial_section_move() noexcept -> bool; */
+
   /* template <typename Func> */
   /* void for_each_in_row(const std::size_t row, Func&& func) noexcept */
   /* { */
