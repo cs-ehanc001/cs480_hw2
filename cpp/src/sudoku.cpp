@@ -306,6 +306,7 @@ auto Sudoku::apply_trivial_row_move() noexcept -> bool
                            - std::begin(population_table))
                           + '0' + 1)};
 
+      assert(data_view(row, trivial_move_idx) == '_');
       data_view(row, trivial_move_idx) = trivial_assignment_value;
       assert(this->is_valid());
       return true;
@@ -380,6 +381,7 @@ auto Sudoku::apply_trivial_column_move() noexcept -> bool
                            - std::begin(population_table))
                           + '0' + 1)};
 
+      assert(data_view(trivial_move_idx, col) == '_');
       data_view(trivial_move_idx, col) = trivial_assignment_value;
       assert(this->is_valid());
       return true;
@@ -457,6 +459,7 @@ auto Sudoku::apply_trivial_section_move() noexcept -> bool
                            - std::begin(population_table))
                           + '0' + 1)};
 
+      assert(data_view(outer_row, outer_col) == '_');
       data_view(outer_row, outer_col) = trivial_assignment_value;
       assert(this->is_valid());
       return true;
