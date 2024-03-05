@@ -55,14 +55,6 @@ public:
   auto operator=(Sudoku&&) noexcept -> Sudoku& = default;
   ~Sudoku() = default;
 
-  [[nodiscard]] auto is_solved() const noexcept -> bool;
-
-  [[nodiscard]] auto is_valid() const noexcept -> bool;
-
-  [[nodiscard]] auto is_legal_assignment(index_pair idxs,
-                                         char value) const noexcept
-    -> bool;
-
   [[nodiscard]] auto data() const noexcept -> const std::array<char, 81>&
   {
     return m_data;
@@ -83,16 +75,36 @@ public:
   // It is used here to wrap the linear contiguous std::array<char, 81> m_data
   // and index it similarly to as if it were a std::array<std::array, 9>, 9>
 
-  [[nodiscard]] auto mdview() noexcept
+  template <bool is_const>
+  using mdview_t =
+    Kokkos::mdspan<std::conditional_t<is_const, const char, char>,
+                   Kokkos::extents<std::size_t, 9, 9>>;
+
+  [[nodiscard]] auto mdview() noexcept -> mdview_t<false>
   {
-    return Kokkos::mdspan<char, Kokkos::extents<std::size_t, 9, 9>> {
-      m_data.data()};
+    return mdview_t<false> {m_data.data()};
   }
 
-  [[nodiscard]] auto mdview() const noexcept
+  [[nodiscard]] auto mdview() const noexcept -> mdview_t<true>
   {
-    return Kokkos::mdspan<const char, Kokkos::extents<std::size_t, 9, 9>> {
-      m_data.data()};
+    return mdview_t<true> {m_data.data()};
+  }
+
+  [[nodiscard]] auto is_solved() const noexcept -> bool;
+
+  [[nodiscard]] auto is_valid() const noexcept -> bool;
+
+  [[nodiscard]] auto is_legal_assignment(index_pair idxs,
+                                         char value) const noexcept
+    -> bool;
+
+  [[nodiscard]] auto try_assign(index_pair idxs, char value) noexcept
+    -> bool
+  {
+    if ( this->is_legal_assignment(idxs, value) ) {
+      this->mdview()(idxs.row, idxs.col) = value;
+      return true;
+    }
   }
 
   // apply a single trivial move (cardinality of reduced domain == 1)
