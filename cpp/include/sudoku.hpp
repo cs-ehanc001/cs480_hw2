@@ -7,7 +7,9 @@
 #include <iostream>
 #include <iterator>
 #include <string>
+#include <type_traits>
 
+#include <supl/metaprogramming.hpp>
 #include <supl/utility.hpp>
 
 #include <mdspan/mdspan.hpp>
@@ -77,7 +79,7 @@ public:
 
   template <bool is_const>
   using mdview_t =
-    Kokkos::mdspan<std::conditional_t<is_const, const char, char>,
+    Kokkos::mdspan<supl::apply_if_t<is_const, std::add_const, char>,
                    Kokkos::extents<std::size_t, 9, 9>>;
 
   [[nodiscard]] auto mdview() noexcept -> mdview_t<false>
