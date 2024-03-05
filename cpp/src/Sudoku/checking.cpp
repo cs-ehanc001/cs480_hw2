@@ -16,17 +16,14 @@ static auto is_populated(const Sudoku& sudoku) noexcept -> bool
   return std::ranges::find(sudoku.data(), '_') == end(sudoku.data());
 }
 
-// Only determines if constraints are intact
-// A partially-filled board which does not violate constraints will return true
-static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
-{
-  const auto data_view = sudoku.mdview();
+struct check_iteration_handler {
 
-  std::bitset<9> check_table {};
+  // NOLINTNEXTLINE(*member*)
+  std::bitset<9>& check_table;
+  decltype(std::declval<const Sudoku&>().mdview()) data_view;
 
-  // returns true if iteration is ok (indeterminate for complete board)
-  // returns false if iteration is bad (definitively board is in illegal state)
-  auto check_iteration {[&](const char cell) {
+  auto operator()(const char cell) -> bool
+  {
     const auto raw_idx {(cell - '0') - 1};
 
     if ( raw_idx == ('_' - '0' - 1) ) {
@@ -45,7 +42,20 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
     }
 
     return true;
-  }};
+  }
+};
+
+// Only determines if constraints are intact
+// A partially-filled board which does not violate constraints will return true
+static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
+{
+  const auto data_view = sudoku.mdview();
+
+  std::bitset<9> check_table {};
+
+  // returns true if iteration is ok (indeterminate for complete board)
+  // returns false if iteration is bad (definitively board is in illegal state)
+  check_iteration_handler check_iteration {check_table, data_view};
 
   // check row-wise
 
@@ -108,9 +118,7 @@ auto Sudoku::is_valid() const noexcept -> bool
 auto Sudoku::is_legal_assignment(index_pair idxs,
                                  char value) const noexcept -> bool
 {
-  /* std::bitset<9> */
+  /* std::bitset<9> check_table {}; */
 
-  /* for (const auto& row : std::views::iota(0_z, 9_z)) { */
-
-  /* } */
+  /* for ( const auto& row : std::views::iota(0_z, 9_z) ) { } */
 }
