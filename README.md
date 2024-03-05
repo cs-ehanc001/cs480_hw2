@@ -18,7 +18,7 @@ The program takes two arguments: the search strategy, and the path to an input f
 The search strategy must be either `--simple` or `--smart`.
 The format for the input file is described below.
 
-The program does accept a `--help` option
+The program does accept a `--help` option to explain its usage.
 
 ## Input File Format
 
