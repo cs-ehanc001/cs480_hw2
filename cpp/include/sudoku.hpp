@@ -13,9 +13,11 @@
 #include <mdspan/mdspan.hpp>
 
 struct index_pair {
-
   std::size_t row;
   std::size_t col;
+
+  friend inline auto operator<=>(const index_pair&,
+                                 const index_pair&) noexcept = default;
 };
 
 class Sudoku

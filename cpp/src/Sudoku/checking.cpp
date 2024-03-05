@@ -22,17 +22,13 @@ namespace {
 // to be used in a loop over a single entire constraint region
 // (row, column, section)
 //
-// check_table must be reset externally between region checks
-//
-// refactored out of a lambda with by-reference captures
-// which was refactored out of the body of an inner loop
+// check_table must be reset between region checks
 struct check_iteration_handler {
 
   // NOLINTNEXTLINE(*member*)
-  std::bitset<9>& check_table;
-  decltype(std::declval<const Sudoku&>().mdview()) data_view;
+  std::bitset<9> check_table;
 
-  auto operator()(const char cell) -> bool
+  auto operator()(const char cell) noexcept -> bool
   {
     if ( cell == '_' ) {
       return true;
@@ -63,6 +59,16 @@ struct check_iteration_handler {
 
     return true;
   }
+
+  void reset() noexcept
+  {
+    check_table.reset();
+  }
+
+  void set(std::size_t idx) noexcept
+  {
+    check_table.set(idx);
+  }
 };
 }  // namespace
 
@@ -72,11 +78,9 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
 {
   const auto data_view = sudoku.mdview();
 
-  std::bitset<9> check_table {};
-
   // returns true if iteration is ok (indeterminate for complete board)
   // returns false if iteration is bad (definitively board is in illegal state)
-  check_iteration_handler check_iteration {check_table, data_view};
+  check_iteration_handler check_iteration {};
 
   // check row-wise
 
@@ -87,7 +91,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
       }
     }
 
-    check_table.reset();
+    check_iteration.reset();
   }
 
   // rows are good
@@ -106,7 +110,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
       }
     }
 
-    check_table.reset();
+    check_iteration.reset();
   }
 
   // columns are good
@@ -120,7 +124,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
       }
     }
 
-    check_table.reset();
+    check_iteration.reset();
   }
 
   return true;
@@ -136,12 +140,68 @@ auto Sudoku::is_valid() const noexcept -> bool
   return is_legal_state(*this);
 }
 
-auto Sudoku::is_legal_assignment(index_pair idxs,
-                                 char value) const noexcept -> bool
+auto Sudoku::is_legal_assignment(const index_pair idxs,
+                                 const char value) const noexcept -> bool
 {
-  /* std::bitset<9> check_table {}; */
+  // value must be in the widest domain
+  assert(value >= '1');
+  assert(value <= '9');
 
-  /* for ( const auto& row : std::views::iota(0_z, 9_z) ) { */
+  const auto data_view = this->mdview();
 
-  /* } */
+  // only unpopulated cells may be assigned to
+  if ( data_view(idxs.row, idxs.col) != '_' ) {
+    return false;
+  }
+
+  check_iteration_handler check_iteration {};
+
+  const auto raw_idx {(value - '0') - 1};
+
+  // sanity checks, guaranteed to hold if value of cell is valid
+  // (checked by previous assert)
+  assert(raw_idx >= 0);
+  assert(raw_idx <= 8);
+  assert(supl::to_string(raw_idx + 1) == supl::to_string(value));
+
+  // index for
+  const std::size_t idx {static_cast<std::size_t>(raw_idx)};
+
+  // check across column
+  check_iteration.set(idx);
+  for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
+    if ( ! check_iteration(data_view(row, idxs.col)) ) {
+      return false;
+    }
+  }
+
+  check_iteration.reset();
+
+  check_iteration.set(idx);
+  for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
+    if ( ! check_iteration(data_view(idxs.row, col)) ) {
+      return false;
+    }
+  }
+
+  check_iteration.reset();
+
+  check_iteration.set(idx);
+
+  // get subtable in section_table which contains indices in question
+  const auto& section_subtable {[&]() {
+    for ( const auto& subtable : section_table ) {
+      if ( std::ranges::find(subtable, idxs) != subtable.end() ) {
+        return subtable;
+      }
+    }
+  }()};  // Immediately Invoked Lambda Expression
+
+  for ( const auto& [row, col] : section_subtable ) {
+    if ( ! check_iteration(data_view(row, col)) ) {
+      return false;
+    }
+  }
+
+  return true;
 }

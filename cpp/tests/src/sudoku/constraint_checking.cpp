@@ -59,8 +59,9 @@ struct run_data {
   bool valid;
 };
 
-static void
-run_check(const run_data& data, Sudoku board, supl::test_results& results)
+static void run_is_valid_check(const run_data& data,
+                               Sudoku board,
+                               supl::test_results& results)
 {
   const auto& [row, col, cell_to, valid] {data};
   board.mdview()(row, col) = cell_to;
@@ -107,7 +108,7 @@ static auto test_row_violation_in_partial_board() -> supl::test_results
   };
 
   std::ranges::for_each(runs, [&](const run_data& data) {
-    run_check(data, get_legal_partial(), results);
+    run_is_valid_check(data, get_legal_partial(), results);
   });
 
   return results;
@@ -130,7 +131,7 @@ static auto test_column_violation_in_partial_board() -> supl::test_results
   };
 
   std::ranges::for_each(runs, [&](const run_data& data) {
-    run_check(data, get_legal_partial(), results);
+    run_is_valid_check(data, get_legal_partial(), results);
   });
 
   return results;
@@ -159,8 +160,46 @@ static auto test_section_violation_in_partial_board() -> supl::test_results
   };
 
   std::ranges::for_each(runs, [&](const run_data& data) {
-    run_check(data, get_legal_partial(), results);
+    run_is_valid_check(data, get_legal_partial(), results);
   });
+
+  return results;
+}
+
+static auto test_is_legal_assignment() -> supl::test_results
+{
+  supl::test_results results;
+
+  std::vector<run_data> runs {
+    {0, 0, '1',  true},
+    {0, 0, '2', false},
+    {0, 0, '3',  true},
+    {0, 0, '5', false},
+    {0, 0, '6', false},
+    {0, 3, '7', false},
+    {0, 6, '8', false},
+    {3, 0, '6', false},
+    {3, 3, '8', false},
+    {3, 6, '7', false},
+    {4, 3, '1',  true},
+    {4, 3, '2',  true},
+    {4, 3, '3', false},
+    {4, 3, '5', false},
+    {4, 3, '6', false},
+    {4, 3, '7', false},
+    {6, 0, '8', false},
+    {6, 3, '2', false},
+    {6, 6, '2', false},
+    {6, 6, '8', false},
+    {8, 6, '4', false},
+    {8, 6, '9',  true},
+  };
+
+  for ( const auto& [row, col, cell_to, valid] : runs ) {
+    Sudoku test_value {get_legal_partial()};
+    results.enforce_equal(
+      test_value.is_legal_assignment({row, col}, cell_to), valid);
+  }
 
   return results;
 }
@@ -177,6 +216,7 @@ static auto constraint_checking() -> supl::test_section
                    &test_column_violation_in_partial_board);
   section.add_test("Section checking partial board",
                    &test_section_violation_in_partial_board);
+  section.add_test("is_legal_assignment", &test_is_legal_assignment);
 
   return section;
 }

@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <ranges>
 
+#include <supl/utility.hpp>
+
 #include "section_table.hpp"
 #include "sudoku.hpp"
 
@@ -30,6 +32,8 @@ auto Sudoku::apply_trivial_move() noexcept -> bool
 
 // below code is less clean than I'd like, repeating myself too much
 // but time constraints have forced my hand
+
+using namespace supl::literals::size_t_literal;
 
 // apply only trivial move based on row constraints (mostly for testing purposes)
 auto Sudoku::apply_trivial_row_move() noexcept -> bool
