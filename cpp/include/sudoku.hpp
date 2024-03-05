@@ -18,6 +18,16 @@ struct index_pair {
 
   friend inline auto operator<=>(const index_pair&,
                                  const index_pair&) noexcept = default;
+
+  friend inline auto operator<<(std::ostream& out,
+                                const index_pair& rhs) noexcept
+    -> std::ostream&
+  {
+    out << supl::stream_adapter {
+      std::pair {rhs.row, rhs.col}
+    };
+    return out;
+  }
 };
 
 class Sudoku

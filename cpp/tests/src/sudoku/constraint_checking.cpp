@@ -53,8 +53,7 @@ static auto test_checking_of_populated_board() -> supl::test_results
 }
 
 struct run_data {
-  std::size_t row;
-  std::size_t col;
+  index_pair idxs;
   char cell_to;
   bool valid;
 };
@@ -63,11 +62,11 @@ static void run_is_valid_check(const run_data& data,
                                Sudoku board,
                                supl::test_results& results)
 {
-  const auto& [row, col, cell_to, valid] {data};
+  const auto& [idxs, cell_to, valid] {data};
+  const auto& [row, col] {idxs};
   board.mdview()(row, col) = cell_to;
-  results.enforce_equal(board.is_valid(),
-                        valid,
-                        supl::to_string(std::tuple {row, col, cell_to}));
+  results.enforce_equal(
+    board.is_valid(), valid, supl::to_string(std::pair {idxs, cell_to}));
 }
 
 static auto get_legal_partial() -> const Sudoku&
@@ -96,15 +95,15 @@ static auto test_row_violation_in_partial_board() -> supl::test_results
   supl::test_results results;
 
   std::vector<run_data> runs {
-    {0, 0, '1',  true},
-    {0, 0, '3',  true},
-    {0, 0, '6', false},
-    {4, 3, '6', false},
-    {4, 3, '1',  true},
-    {4, 3, '2',  true},
-    {4, 3, '7', false},
-    {8, 6, '4', false},
-    {8, 6, '9',  true}
+    {{0, 0}, '1',  true},
+    {{0, 0}, '3',  true},
+    {{0, 0}, '6', false},
+    {{4, 3}, '6', false},
+    {{4, 3}, '1',  true},
+    {{4, 3}, '2',  true},
+    {{4, 3}, '7', false},
+    {{8, 6}, '4', false},
+    {{8, 6}, '9',  true},
   };
 
   std::ranges::for_each(runs, [&](const run_data& data) {
@@ -119,15 +118,15 @@ static auto test_column_violation_in_partial_board() -> supl::test_results
   supl::test_results results;
 
   std::vector<run_data> runs {
-    {0, 0, '1',  true},
-    {0, 0, '3',  true},
-    {0, 0, '2', false},
-    {4, 3, '3', false},
-    {4, 3, '1',  true},
-    {4, 3, '2',  true},
-    {6, 6, '2', false},
-    {8, 6, '4', false},
-    {8, 6, '9',  true}
+    {{0, 0}, '1',  true},
+    {{0, 0}, '3',  true},
+    {{0, 0}, '2', false},
+    {{4, 3}, '3', false},
+    {{4, 3}, '1',  true},
+    {{4, 3}, '2',  true},
+    {{6, 6}, '2', false},
+    {{8, 6}, '4', false},
+    {{8, 6}, '9',  true}
   };
 
   std::ranges::for_each(runs, [&](const run_data& data) {
@@ -142,21 +141,21 @@ static auto test_section_violation_in_partial_board() -> supl::test_results
   supl::test_results results;
 
   std::vector<run_data> runs {
-    {0, 0, '1',  true},
-    {0, 0, '3',  true},
-    {4, 3, '5', false},
-    {4, 3, '1',  true},
-    {4, 3, '2',  true},
-    {8, 6, '9',  true},
-    {0, 0, '5', false},
-    {0, 3, '7', false},
-    {0, 6, '8', false},
-    {3, 0, '6', false},
-    {3, 3, '8', false},
-    {3, 6, '7', false},
-    {6, 0, '8', false},
-    {6, 3, '2', false},
-    {6, 6, '8', false},
+    {{0, 0}, '1',  true},
+    {{0, 0}, '3',  true},
+    {{4, 3}, '5', false},
+    {{4, 3}, '1',  true},
+    {{4, 3}, '2',  true},
+    {{8, 6}, '9',  true},
+    {{0, 0}, '5', false},
+    {{0, 3}, '7', false},
+    {{0, 6}, '8', false},
+    {{3, 0}, '6', false},
+    {{3, 3}, '8', false},
+    {{3, 6}, '7', false},
+    {{6, 0}, '8', false},
+    {{6, 3}, '2', false},
+    {{6, 6}, '8', false},
   };
 
   std::ranges::for_each(runs, [&](const run_data& data) {
@@ -171,34 +170,37 @@ static auto test_is_legal_assignment() -> supl::test_results
   supl::test_results results;
 
   std::vector<run_data> runs {
-    {0, 0, '1',  true},
-    {0, 0, '2', false},
-    {0, 0, '3',  true},
-    {0, 0, '5', false},
-    {0, 0, '6', false},
-    {0, 3, '7', false},
-    {0, 6, '8', false},
-    {3, 0, '6', false},
-    {3, 3, '8', false},
-    {3, 6, '7', false},
-    {4, 3, '1',  true},
-    {4, 3, '2',  true},
-    {4, 3, '3', false},
-    {4, 3, '5', false},
-    {4, 3, '6', false},
-    {4, 3, '7', false},
-    {6, 0, '8', false},
-    {6, 3, '2', false},
-    {6, 6, '2', false},
-    {6, 6, '8', false},
-    {8, 6, '4', false},
-    {8, 6, '9',  true},
+    {{0, 0}, '1',  true},
+    {{0, 0}, '2', false},
+    {{0, 0}, '3',  true},
+    {{0, 0}, '5', false},
+    {{0, 0}, '6', false},
+    {{0, 3}, '7', false},
+    {{0, 6}, '8', false},
+    {{3, 0}, '6', false},
+    {{3, 3}, '8', false},
+    {{3, 6}, '7', false},
+    {{4, 3}, '1',  true},
+    {{4, 3}, '2',  true},
+    {{4, 3}, '3', false},
+    {{4, 3}, '5', false},
+    {{4, 3}, '6', false},
+    {{4, 3}, '7', false},
+    {{6, 0}, '8', false},
+    {{6, 3}, '2', false},
+    {{6, 6}, '2', false},
+    {{6, 6}, '8', false},
+    {{8, 6}, '4', false},
+    {{8, 6}, '9',  true},
   };
 
-  for ( const auto& [row, col, cell_to, valid] : runs ) {
+  for ( const auto& [idxs, cell_to, valid] : runs ) {
+    const auto& [row, col] {idxs};
     Sudoku test_value {get_legal_partial()};
     results.enforce_equal(
-      test_value.is_legal_assignment({row, col}, cell_to), valid);
+      test_value.is_legal_assignment({row, col}, cell_to),
+      valid,
+      supl::to_string(std::pair {idxs, cell_to}));
   }
 
   return results;
