@@ -12,6 +12,12 @@
 
 #include <mdspan/mdspan.hpp>
 
+struct index_pair {
+
+  std::size_t row;
+  std::size_t col;
+};
+
 class Sudoku
 {
 public:
@@ -40,6 +46,10 @@ public:
   [[nodiscard]] auto is_solved() const noexcept -> bool;
 
   [[nodiscard]] auto is_valid() const noexcept -> bool;
+
+  [[nodiscard]] auto is_legal_assignment(index_pair idxs,
+                                         char value) const noexcept
+    -> bool;
 
   [[nodiscard]] auto data() const noexcept -> const std::array<char, 81>&
   {
@@ -78,36 +88,16 @@ public:
   // with the single possibility)
   //
   // returns true if move was applied, returns false if no trivial move exists
-  auto apply_trivial_move() noexcept -> bool;
+  [[nodiscard]] auto apply_trivial_move() noexcept -> bool;
 
   // apply only trivial move based on row constraints (mostly for testing purposes)
-  auto apply_trivial_row_move() noexcept -> bool;
+  [[nodiscard]] auto apply_trivial_row_move() noexcept -> bool;
 
   // apply only trivial move based on column constraints (mostly for testing purposes)
-  auto apply_trivial_column_move() noexcept -> bool;
+  [[nodiscard]] auto apply_trivial_column_move() noexcept -> bool;
 
   // apply only trivial move based on section constraints (mostly for testing purposes)
-  auto apply_trivial_section_move() noexcept -> bool;
-
-  /* template <typename Func> */
-  /* void for_each_in_row(const std::size_t row, Func&& func) noexcept */
-  /* { */
-  /*   using namespace supl::literals::size_t_literal; */
-  /*   const auto data_view {this->mdview()}; */
-  /*   for ( const std::size_t col : std::views::iota(0_z, 9_z) ) { */
-  /*     std::forward<Func>(func)(data_view(row, col)); */
-  /*   } */
-  /* } */
-
-  /* template <typename Func> */
-  /* void for_each_in_col(const std::size_t col, Func&& func) noexcept */
-  /* { */
-  /*   using namespace supl::literals::size_t_literal; */
-  /*   const auto data_view {this->mdview()}; */
-  /*   for ( const std::size_t row : std::views::iota(0_z, 9_z) ) { */
-  /*     std::forward<Func>(func)(data_view(row, col)); */
-  /*   } */
-  /* } */
+  [[nodiscard]] auto apply_trivial_section_move() noexcept -> bool;
 
   friend auto operator<=>(const Sudoku& lhs,
                           const Sudoku& rhs) noexcept = default;

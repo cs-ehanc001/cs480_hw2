@@ -1,4 +1,5 @@
 #include <array>
+#include <bitset>
 #include <cassert>
 #include <cstddef>
 #include <ranges>
@@ -21,31 +22,26 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
 {
   const auto data_view = sudoku.mdview();
 
-  std::array<bool, 9> check_table {};
+  std::bitset<9> check_table {};
 
   // returns true if iteration is ok (indeterminate for complete board)
   // returns false if iteration is bad (definitively board is in illegal state)
   auto check_iteration {[&](const char cell) {
-    const auto idx {(cell - '0') - 1};
+    const auto raw_idx {(cell - '0') - 1};
 
-    if ( idx == ('_' - '0' - 1) ) {
+    if ( raw_idx == ('_' - '0' - 1) ) {
       return true;
     }
+    assert(raw_idx >= 0);
+    assert(raw_idx <= 8);
+    assert(supl::to_string(raw_idx + 1) == supl::to_string(cell));
 
-    assert(supl::to_string(idx + 1) == supl::to_string(cell));
-    assert(idx >= 0);
-    assert(idx <= 8);
+    const std::size_t idx {static_cast<std::size_t>(raw_idx)};
 
-    /* std::cout << sudoku << '\n'; */
-
-    /* std::cout << supl::stream_adapter{std::tuple{row, col, check_table, idx, check_table.at(idx)}} << '\n'; */
-
-    if ( bool& check_table_entry =
-           check_table.at(static_cast<std::size_t>(idx));
-         check_table_entry ) {
+    if ( check_table.test(idx) ) {
       return false;
     } else {
-      check_table_entry = true;
+      check_table.set(idx);
     }
 
     return true;
@@ -60,7 +56,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
       }
     }
 
-    std::ranges::fill(check_table, false);
+    check_table.reset();
   }
 
   // rows are good
@@ -79,7 +75,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
       }
     }
 
-    std::ranges::fill(check_table, false);
+    check_table.reset();
   }
 
   // columns are good
@@ -93,7 +89,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
       }
     }
 
-    std::ranges::fill(check_table, false);
+    check_table.reset();
   }
 
   return true;
@@ -109,3 +105,12 @@ auto Sudoku::is_valid() const noexcept -> bool
   return is_legal_state(*this);
 }
 
+auto Sudoku::is_legal_assignment(index_pair idxs,
+                                 char value) const noexcept -> bool
+{
+  /* std::bitset<9> */
+
+  /* for (const auto& row : std::views::iota(0_z, 9_z)) { */
+
+  /* } */
+}
