@@ -198,6 +198,17 @@ using empty =
 template <typename LIST>
 constexpr inline bool empty_v = empty<LIST>::value;
 
+///////////////////////////////////////////// clear
+
+template <typename LIST>
+struct clear;
+
+template <template <typename...> typename LIST, typename... Elems>
+struct clear<LIST<Elems...>> : type_identity<LIST<>> { };
+
+template <typename LIST>
+using clear_t = typename clear<LIST>::type;
+
 ///////////////////////////////////////////// concat
 
 /* {{{ doc */
@@ -1172,6 +1183,54 @@ struct is_subset
 
 template <typename LIST1, typename LIST2>
 constexpr inline bool is_subset_v = is_subset<LIST1, LIST2>::value;
+
+///////////////////////////////////////////// sort_by
+
+/* namespace impl { */
+/*   template <template <typename> typename PROJ, */
+/*             template <typename> */
+/*             typename COMP, */
+/*             typename LIST, */
+/*             typename BUILDER> */
+/*   struct sort_by_impl; */
+
+/*   template <template <typename> typename PROJ, */
+/*             template <typename> */
+/*             typename COMP, */
+/*             template <typename...> */
+/*             typename LIST, */
+/*             typename... Elems, */
+/*             typename... Built> */
+/*   struct sort_by_impl<PROJ, COMP, LIST<Elems...>, LIST<Built...>> */
+/*       : sort_by_impl< */
+/*           PROJ, */
+/*           COMP, */
+/*           erase_t<LIST<Elems...>, */
+/*                   find_v<LIST<Elems...>, least_of<PROJ, COMP, Elems...>>>, */
+/*           LIST<Built..., least_of<PROJ, COMP, Elems...>>> { }; */
+
+/*   template <template <typename> typename PROJ, */
+/*             template <typename> */
+/*             typename COMP, */
+/*             template <typename...> */
+/*             typename LIST, */
+/*             typename... Built> */
+/*   struct sort_by_impl<PROJ, COMP, LIST<>, LIST<Built...>> */
+/*       : type_identity<LIST<Built...>> { }; */
+
+/* }  // namespace impl */
+
+/* template <template <typename> typename PROJ, */
+/*           template <typename> */
+/*           typename COMP, */
+/*           typename LIST> */
+/* struct sort_by : impl::sort_by_impl<PROJ, COMP, LIST, clear_t<LIST>> { }; */
+
+/* template <template <typename> typename PROJ, */
+/*           template <typename> */
+/*           typename COMP, */
+/*           typename LIST> */
+/* using sort_by_t = typename sort_by<PROJ, COMP, LIST>::type; */
 
 }  // namespace supl::tl
 
