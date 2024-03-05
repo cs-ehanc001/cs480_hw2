@@ -15,19 +15,6 @@ static auto is_populated(const Sudoku& sudoku) noexcept -> bool
   return std::ranges::find(sudoku.data(), '_') == end(sudoku.data());
 }
 
-template <typename Iter, typename T>
-static auto is_uniformly_filled(Iter begin, Iter end, const T& value)
-  -> bool
-{
-  for ( ; begin != end; ++begin ) {
-    if ( *begin != value ) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 // Only determines if constraints are intact
 // A partially-filled board which does not violate constraints will return true
 static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
