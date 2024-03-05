@@ -16,6 +16,16 @@ static auto is_populated(const Sudoku& sudoku) noexcept -> bool
   return std::ranges::find(sudoku.data(), '_') == end(sudoku.data());
 }
 
+// anonymous namespace to enforce internal linkage
+namespace {
+// function object implementing a single cell check
+// to be used in a loop over a single entire constraint region
+// (row, column, section)
+//
+// check_table must be reset externally between region checks
+//
+// refactored out of a lambda with by-reference captures
+// which was refactored out of the body of an inner loop
 struct check_iteration_handler {
 
   // NOLINTNEXTLINE(*member*)
@@ -24,17 +34,27 @@ struct check_iteration_handler {
 
   auto operator()(const char cell) -> bool
   {
-    const auto raw_idx {(cell - '0') - 1};
-
-    if ( raw_idx == ('_' - '0' - 1) ) {
+    if ( cell == '_' ) {
       return true;
     }
+
+    // a char which is a digit has numerical value:
+    // (stoi(to_string(the_char)) + '0')
+    // thus, (cell - '0') will map '2' to 2
+    // this is off-by-one of the desired index into the check_table,
+    // so, this line maps '2' to 1
+    const auto raw_idx {(cell - '0') - 1};
+
+    // sanity checks, guaranteed to hold if value of cell
+    // is numeric or '_' ('_' handled by early exit)
     assert(raw_idx >= 0);
     assert(raw_idx <= 8);
     assert(supl::to_string(raw_idx + 1) == supl::to_string(cell));
 
     const std::size_t idx {static_cast<std::size_t>(raw_idx)};
 
+    // duplicate checking: if '2' appears twice,
+    // check_table[1] will already be set
     if ( check_table.test(idx) ) {
       return false;
     } else {
@@ -44,6 +64,7 @@ struct check_iteration_handler {
     return true;
   }
 };
+}  // namespace
 
 // Only determines if constraints are intact
 // A partially-filled board which does not violate constraints will return true
@@ -120,5 +141,7 @@ auto Sudoku::is_legal_assignment(index_pair idxs,
 {
   /* std::bitset<9> check_table {}; */
 
-  /* for ( const auto& row : std::views::iota(0_z, 9_z) ) { } */
+  /* for ( const auto& row : std::views::iota(0_z, 9_z) ) { */
+
+  /* } */
 }
