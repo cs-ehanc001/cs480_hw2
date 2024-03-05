@@ -316,6 +316,8 @@ auto Sudoku::apply_trivial_row_move() noexcept -> bool
     // reset population table (fill with false)
     std::ranges::fill(population_table, false);
   }
+
+  return false;
 }
 
 // apply only trivial move based on column constraints (mostly for testing purposes)
