@@ -70,18 +70,17 @@ auto Sudoku::solve(
     std::deque<Sudoku> retval;
 
     std::ranges::copy(
-      std::views::filter(
-        all_possible_assignments,
-        [&this_sudoku](const Assignment& assignment) -> bool {
-          return this_sudoku.is_legal_assignment(assignment);
-        })
+      all_possible_assignments
+        | std::views::filter(
+          [&this_sudoku](const Assignment& assignment) -> bool {
+            return this_sudoku.is_legal_assignment(assignment);
+          })
         | std::views::transform(
           [&this_sudoku](const Assignment& assignment) {
             return this_sudoku.assign_copy(assignment);
           }),
       std::back_inserter(retval));
 
-    std::cout << supl::stream_adapter {retval} << std::endl;
     return retval;
   }()};
 
