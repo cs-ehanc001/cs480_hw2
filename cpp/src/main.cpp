@@ -62,7 +62,7 @@ auto main(const int argc, const char* const* const argv) -> int
   std::cout << "Beginning state:\n" << sudoku << '\n';
 
   //
-  const auto optimization_callback {be_smart ? &smart_optimization
+  const auto optimization_callback {be_smart ? &trivial_move_optimization
                                              : &null_optimization};
 
   const auto start_time {std::chrono::steady_clock::now()};

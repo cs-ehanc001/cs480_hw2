@@ -170,6 +170,6 @@ X X X | X X X | X X X
 // forward declarations for optimization callbacks
 
 auto null_optimization(Sudoku&) -> std::size_t;
-auto smart_optimization(Sudoku&) -> std::size_t;
+auto trivial_move_optimization(Sudoku&) -> std::size_t;
 
 #endif
