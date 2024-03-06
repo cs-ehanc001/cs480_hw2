@@ -1,2 +1,2 @@
-add_library(Game_and_Logic STATIC checking.cpp trivial_moves.cpp)
+add_library(Game_and_Logic STATIC checking.cpp trivial_moves.cpp solve.cpp)
 target_link_libraries(Game_and_Logic common_properties)

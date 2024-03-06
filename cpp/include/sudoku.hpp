@@ -125,6 +125,10 @@ public:
   // apply only trivial move based on section constraints (mostly for testing purposes)
   [[nodiscard]] auto apply_trivial_section_move() noexcept -> bool;
 
+  [[nodiscard]] auto solve(std::add_pointer_t<std::size_t(Sudoku&)>
+                             optimization_callback) noexcept
+    -> std::size_t;
+
   friend auto operator<=>(const Sudoku& lhs,
                           const Sudoku& rhs) noexcept = default;
 
@@ -162,5 +166,10 @@ X X X | X X X | X X X
     return out << output_buffer;
   }
 };
+
+// forward declarations for optimization callbacks
+
+auto null_optimization(Sudoku&) -> std::size_t;
+auto smart_optimization(Sudoku&) -> std::size_t;
 
 #endif

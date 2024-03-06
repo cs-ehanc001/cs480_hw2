@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -58,15 +59,37 @@ auto main(const int argc, const char* const* const argv) -> int
     return retval;
   }()};
 
-  // below is placeholder
+  std::cout << "Beginning state:\n" << sudoku << '\n';
 
-  std::cout << sudoku << '\n';
+  //
+  const auto optimization_callback {be_smart ? &smart_optimization
+                                             : &null_optimization};
 
-  if ( be_smart ) {
-    std::cout << "Solving smartly\n";
-  } else {
-    std::cout << "Solving simply\n";
-  }
+  const auto start_time {std::chrono::steady_clock::now()};
+
+  const std::size_t assignment_count {sudoku.solve(optimization_callback)};
+
+  const auto end_time {std::chrono::steady_clock::now()};
+
+  std::cout << "Solution state:\n" << sudoku << "\n\n";
+  std::cout << "Solution found with: " << assignment_count
+            << " variable assignments\n";
+
+  std::cout << "Solution took: "
+            << std::chrono::duration_cast<std::chrono::microseconds>(
+                 end_time - start_time)
+                 .count()
+            << "us\n"
+            << "Equal to: "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(
+                 end_time - start_time)
+                 .count()
+            << "ms\n"
+            << "Equal to: "
+            << std::chrono::duration_cast<std::chrono::seconds>(
+                 end_time - start_time)
+                 .count()
+            << "s\n";
 
   return EXIT_SUCCESS;
 }
