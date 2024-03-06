@@ -30,9 +30,8 @@ File extension is not checked by the program.
 Below is the "easy" problem from the homework document in the appropriate format.
 
 The directory `inputs` contains the "easy," "medium," "hard," and "evil"
-puzzles from the homework document,
-as well as "trivial" and "already_solved" puzzles,
-along with an extra example.
+puzzles from the homework document, along with one extra example.
+"trivial", "extra_trivial", and "already_solved" puzzles are also included, however exist primarily for testing purposes.
 
 ```
 _ 3 _ _ 8 _ _ _ 6

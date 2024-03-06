@@ -32,6 +32,25 @@ struct index_pair {
   }
 };
 
+// A simple representation of a possible assignment of a value
+struct Assignment {
+  index_pair idxs;
+  char value;
+
+  friend inline auto operator<=>(const Assignment&,
+                                 const Assignment&) noexcept = default;
+
+  friend inline auto operator<<(std::ostream& out,
+                                const Assignment& rhs) noexcept
+    -> std::ostream&
+  {
+    out << supl::stream_adapter {
+      std::pair {rhs.idxs, rhs.value}
+    };
+    return out;
+  }
+};
+
 class Sudoku
 {
 public:
@@ -100,6 +119,12 @@ public:
                                          char value) const noexcept
     -> bool;
 
+  [[nodiscard]] auto
+  is_legal_assignment(Assignment assignment) const noexcept -> bool
+  {
+    return this->is_legal_assignment(assignment.idxs, assignment.value);
+  }
+
   [[nodiscard]] auto try_assign(index_pair idxs, char value) noexcept
     -> bool
   {
@@ -107,6 +132,21 @@ public:
       this->mdview()(idxs.row, idxs.col) = value;
       return true;
     }
+    return false;
+  }
+
+  [[nodiscard]] auto try_assign(Assignment assignment) noexcept -> bool
+  {
+    return this->try_assign(assignment.idxs, assignment.value);
+  }
+
+  [[nodiscard]] auto assign_copy(Assignment assignment) noexcept -> Sudoku
+  {
+    assert(this->is_legal_assignment(assignment));
+    Sudoku copy {*this};
+    const bool success {copy.try_assign(assignment)};
+    assert(success);
+    return copy;
   }
 
   // apply a single trivial move (cardinality of reduced domain == 1)

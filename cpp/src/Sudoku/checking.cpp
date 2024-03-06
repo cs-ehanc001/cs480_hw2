@@ -195,6 +195,7 @@ auto Sudoku::is_legal_assignment(const index_pair idxs,
         return subtable;
       }
     }
+    assert(false);
   }()};  // Immediately Invoked Lambda Expression
 
   for ( const auto& [row, col] : section_subtable ) {
