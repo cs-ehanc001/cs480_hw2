@@ -56,6 +56,9 @@ constexpr static std::array all_possible_assignments {[]() {
   return retval;
 }()};
 
+// implemented using dfs
+// no depth limiting required, as infinite loops are impossible
+// backtracking is baked in :)
 auto Sudoku::solve(
   std::add_pointer_t<std::size_t(Sudoku&)> optimization_callback) noexcept
   -> std::size_t
@@ -66,25 +69,50 @@ auto Sudoku::solve(
   // apply any trivial moves available
   assignment_count += optimization_callback(*this);
 
-  std::stack<Sudoku> frontier {[&this_sudoku = *this]() {
+  auto generate_states {[&assignment_count](const Sudoku& sudoku) {
     std::deque<Sudoku> retval;
 
     std::ranges::copy(
       all_possible_assignments
         | std::views::filter(
-          [&this_sudoku](const Assignment& assignment) -> bool {
-            return this_sudoku.is_legal_assignment(assignment);
+          [&sudoku](const Assignment& assignment) -> bool {
+            return sudoku.is_legal_assignment(assignment);
           })
-        | std::views::transform(
-          [&this_sudoku](const Assignment& assignment) {
-            return this_sudoku.assign_copy(assignment);
+        | std::views::transform([&sudoku](const Assignment& assignment) {
+            return sudoku.assign_copy(assignment);
           }),
       std::back_inserter(retval));
 
-    return retval;
-  }()};
+    assignment_count += retval.size();
 
-  /* while ( ! frontier.empty() ) { } */
+    return retval;
+  }};
+
+  std::stack<Sudoku> frontier {generate_states(*this)};
+
+  while ( ! frontier.empty() ) {
+    // goal check top before expansion
+    if ( frontier.top().is_solved() ) {
+      *this = frontier.top();  // goal achieved! yay!
+      break;
+    }
+
+    // generate child nodes
+    std::deque<Sudoku> new_states {generate_states(frontier.top())};
+
+    // apply optimization if in use
+    // no-op if not
+    std::ranges::for_each(
+      new_states,
+      [&assignment_count, &optimization_callback](Sudoku& sudoku) {
+        assignment_count += optimization_callback(sudoku);
+      });
+
+    // copy new states to the frontier
+    std::ranges::for_each(new_states, [&frontier](const Sudoku& sudoku) {
+      frontier.push(sudoku);
+    });
+  }
 
   assert(this->is_solved());
   return assignment_count;

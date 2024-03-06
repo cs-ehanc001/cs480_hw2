@@ -140,7 +140,8 @@ public:
     return this->try_assign(assignment.idxs, assignment.value);
   }
 
-  [[nodiscard]] auto assign_copy(Assignment assignment) noexcept -> Sudoku
+  [[nodiscard]] auto assign_copy(Assignment assignment) const noexcept
+    -> Sudoku
   {
     assert(this->is_legal_assignment(assignment));
     Sudoku copy {*this};
