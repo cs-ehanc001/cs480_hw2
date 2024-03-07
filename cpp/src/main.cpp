@@ -36,7 +36,7 @@ auto main(const int argc, const char* const* const argv) -> int
   }
 
   constexpr static auto strategy_pred {
-    supl::equals_any_of("--simple"sv, "--smart"sv)};
+    supl::equals_any_of("--simple"sv, "--smart"sv, "--just-print"sv)};
   if ( ! strategy_pred(argv[1]) ) {
     std::cerr << "Bad search strategy: \"" << argv[1]
               << "\". Must be [--simple] or [--smart].\n";
@@ -61,7 +61,11 @@ auto main(const int argc, const char* const* const argv) -> int
 
   std::cout << "Beginning state:\n" << sudoku << '\n';
 
-  //
+  // undocumented feature to just print an input file
+  if ( "--just-print"sv == argv[1] ) {
+    return EXIT_SUCCESS;
+  }
+
   const auto optimization_callback {be_smart ? &trivial_move_optimization
                                              : &null_optimization};
 

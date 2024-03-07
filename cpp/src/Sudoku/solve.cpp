@@ -108,6 +108,12 @@ auto Sudoku::solve(
         assignment_count += optimization_callback(sudoku);
       });
 
+    std::cout << new_states.size()
+              << " New States: " << supl::stream_adapter {new_states}
+              << '\n';
+
+    std::cout << "Expanded from: " << frontier.top() << '\n';
+
     // copy new states to the frontier
     std::ranges::for_each(new_states, [&frontier](const Sudoku& sudoku) {
       frontier.push(sudoku);
