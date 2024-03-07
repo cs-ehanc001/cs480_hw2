@@ -16,6 +16,12 @@ static auto is_populated(const Sudoku& sudoku) noexcept -> bool
   return std::ranges::find(sudoku.data(), '_') == end(sudoku.data());
 }
 
+static auto is_unsatisfiable_cell(const Sudoku& sudoku) noexcept -> bool
+{
+  // stub
+  return false;
+}
+
 // anonymous namespace to enforce internal linkage
 namespace {
 // function object implementing a single cell check
@@ -127,7 +133,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
     check_iteration.reset();
   }
 
-  return true;
+  return ! is_unsatisfiable_cell(sudoku);
 }
 
 auto Sudoku::is_solved() const noexcept -> bool

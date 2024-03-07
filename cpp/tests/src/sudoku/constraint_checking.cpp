@@ -206,6 +206,13 @@ static auto test_is_legal_assignment() -> supl::test_results
   return results;
 }
 
+static auto test_unsatisfiable_cell() -> supl::test_results
+{
+  supl::test_results results;
+
+  return results;
+}
+
 static auto constraint_checking() -> supl::test_section
 {
   supl::test_section section;
@@ -219,6 +226,7 @@ static auto constraint_checking() -> supl::test_section
   section.add_test("Section checking partial board",
                    &test_section_violation_in_partial_board);
   section.add_test("is_legal_assignment", &test_is_legal_assignment);
+  section.add_test("unsatisfiable_cell", &test_unsatisfiable_cell);
 
   return section;
 }
