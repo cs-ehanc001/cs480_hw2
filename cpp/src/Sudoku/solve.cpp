@@ -81,31 +81,40 @@ auto Sudoku::solve(
   // apply any trivial moves available
   assignment_count += optimization_callback(*this);
 
-  auto generate_states {
-    [&assignment_count](const Search_Node& search_node) {
-      std::deque<Search_Node> retval;
+  auto generate_states {[&assignment_count, &optimization_callback](
+                          const Search_Node& search_node) {
+    std::deque<Search_Node> retval;
 
-      std::ranges::copy(
-        all_possible_assignments
-          | std::views::filter(
-            [&search_node](const Assignment& assignment) -> bool {
-              return search_node.sudoku.is_legal_assignment(assignment);
-            })
-          | std::views::transform(
-            [&search_node](const Assignment& assignment) -> Search_Node {
-              return {search_node.sudoku.assign_copy(assignment),
-                      search_node.depth + 1};
-            })
-          | std::views::filter([](const Search_Node& new_node) {
-              return new_node.sudoku.is_valid();
-            })
-          | std::views::reverse,
-        std::back_inserter(retval));
+    std::ranges::copy(
+      all_possible_assignments
+        | std::views::filter(
+          [&search_node](const Assignment& assignment) -> bool {
+            return search_node.sudoku.is_legal_assignment(assignment);
+          })
+        | std::views::transform(
+          [&search_node](const Assignment& assignment) -> Search_Node {
+            return {search_node.sudoku.assign_copy(assignment),
+                    search_node.depth + 1};
+          })
+        | std::views::filter([](const Search_Node& new_node) -> bool {
+            return new_node.sudoku.is_valid();
+          })
+        | std::views::reverse,
+      std::back_inserter(retval));
 
-      assignment_count += retval.size();
+    // apply optimization if in use (application of forced moves)
+    // no-op if not
+    std::ranges::for_each(retval,
+                          [&assignment_count, &optimization_callback](
+                            Search_Node& search_node) {
+                            assignment_count +=
+                              optimization_callback(search_node.sudoku);
+                          });
 
-      return retval;
-    }};
+    assignment_count += retval.size();
+
+    return retval;
+  }};
 
   std::stack<Search_Node> frontier {generate_states({*this, 0})};
 
@@ -139,15 +148,6 @@ auto Sudoku::solve(
       careful_pop();
       careful_pop();
     }
-
-    // apply optimization if in use
-    // no-op if not
-    std::ranges::for_each(new_states,
-                          [&assignment_count, &optimization_callback](
-                            Search_Node& search_node) {
-                            assignment_count +=
-                              optimization_callback(search_node.sudoku);
-                          });
 
     std::cout << new_states.size()
               << " New States: " << supl::stream_adapter {new_states}
