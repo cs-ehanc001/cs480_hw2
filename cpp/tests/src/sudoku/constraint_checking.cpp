@@ -206,6 +206,36 @@ static auto test_is_legal_assignment() -> supl::test_results
   return results;
 }
 
+static auto test_query_filled_domain() -> supl::test_results
+{
+  supl::test_results results;
+
+  const Sudoku test {
+    {
+     // clang-format off
+  '1', '9', '8', '5', '2', '6', '3', '4', '7',
+  '7', '2', '5', '3', '4', '1', '6', '9', '8',
+  '3', '4', '6', '9', '7', '8', '2', '1', '5',
+  '9', '8', '1', '2', '5', '7', '4', '6', '3',
+  '5', '6', '4', '1', '3', '9', '8', '7', '2',
+  '2', '3', '7', '6', '8', '4', '1', '5', '9',
+  '4', '7', '3', '8', '1', '5', '9', '2', '6',
+  '8', '1', '9', '7', '6', '2', '5', '3', '4',
+  '6', '5', '2', '4', '9', '3', '7', '8', '1'
+     // clang-format on
+    }
+  };
+
+  const auto domains {test.query_domains()};
+
+  for ( const auto& domain : domains ) {
+    results.enforce_true(domain.legal_assignments.none(),
+                         supl::to_string(domain));
+  }
+
+  return results;
+}
+
 static auto constraint_checking() -> supl::test_section
 {
   supl::test_section section;
@@ -219,6 +249,7 @@ static auto constraint_checking() -> supl::test_section
   section.add_test("Section checking partial board",
                    &test_section_violation_in_partial_board);
   section.add_test("is_legal_assignment", &test_is_legal_assignment);
+  section.add_test("domain query - filled", &test_query_filled_domain);
 
   return section;
 }
