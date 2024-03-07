@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <cstdlib>
 #include <deque>
 #include <iterator>
 #include <ranges>
@@ -107,7 +108,7 @@ auto Sudoku::solve(
   const auto careful_pop {[&frontier]() {
     if ( frontier.empty() ) {
       std::cerr << "No solution found!\n";
-      exit(EXIT_FAILURE);
+      std::exit(EXIT_FAILURE);
     }
 
     std::cout << "POP!\n";
