@@ -206,3 +206,17 @@ auto Sudoku::is_legal_assignment(const index_pair idxs,
 
   return true;
 }
+
+///////////////////////////////////////////// DOMAINS
+
+struct variable_domain {
+  index_pair idxs {};
+  std::bitset<9> legal_assignments {};
+};
+
+// get remaining domain of each unassigned variable
+// and check for any variable with a null domain
+//
+// find '_' and save positions,
+// trim down domain by walking the enclosing row, col, and section
+
