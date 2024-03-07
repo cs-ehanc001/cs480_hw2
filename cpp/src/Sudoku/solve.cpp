@@ -95,7 +95,11 @@ auto Sudoku::solve(
             [&search_node](const Assignment& assignment) -> Search_Node {
               return {search_node.sudoku.assign_copy(assignment),
                       search_node.depth + 1};
-            }),
+            })
+          | std::views::filter([](const Search_Node& new_node) {
+              return new_node.sudoku.is_valid();
+            })
+          | std::views::reverse,
         std::back_inserter(retval));
 
       assignment_count += retval.size();
@@ -132,6 +136,7 @@ auto Sudoku::solve(
     std::deque<Search_Node> new_states {generate_states(frontier.top())};
 
     if ( new_states.empty() ) {
+      careful_pop();
       careful_pop();
     }
 
