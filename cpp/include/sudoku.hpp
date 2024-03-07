@@ -145,7 +145,7 @@ public:
   {
     assert(this->is_legal_assignment(assignment));
     Sudoku copy {*this};
-    const bool success {copy.try_assign(assignment)};
+    [[maybe_unused]] const bool success {copy.try_assign(assignment)};
     assert(success);
     return copy;
   }
