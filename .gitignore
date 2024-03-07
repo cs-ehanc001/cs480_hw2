@@ -3,4 +3,5 @@ doc/html/
 .idea/
 build/
 clang/
+release/
 build-clion/
