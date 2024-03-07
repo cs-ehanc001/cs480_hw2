@@ -104,6 +104,17 @@ auto Sudoku::solve(
 
   std::stack<Search_Node> frontier {generate_states({*this, 0})};
 
+  const auto careful_pop {[&frontier]() {
+    if ( frontier.empty() ) {
+      std::cerr << "No solution found!\n";
+      exit(EXIT_FAILURE);
+    }
+
+    // gotta pop!!
+    std::cout << "POP!\n";
+    frontier.pop();
+  }};
+
   while ( ! frontier.empty() ) {
     // goal check top before expansion
     if ( frontier.top().sudoku.is_solved() ) {
@@ -113,15 +124,16 @@ auto Sudoku::solve(
 
     // do not exceed maximum depth
     while ( frontier.top().depth >= max_depth ) {
-      frontier.pop();
-      if ( frontier.empty() ) {
-        std::cerr << "No solution found!\n";
-        exit(EXIT_FAILURE);
-      }
+      std::cout << "DEEP POP!\n";
+      careful_pop();
     }
 
     // generate child nodes
     std::deque<Search_Node> new_states {generate_states(frontier.top())};
+
+    if ( new_states.empty() ) {
+      careful_pop();
+    }
 
     // apply optimization if in use
     // no-op if not
@@ -138,10 +150,7 @@ auto Sudoku::solve(
 
     std::cout << "Expanded from: " << frontier.top().sudoku << '\n';
 
-    assert(! frontier.empty());
-
-    // gotta pop!!
-    frontier.pop();
+    careful_pop();
 
     // copy new states to the frontier
     std::ranges::for_each(new_states,
