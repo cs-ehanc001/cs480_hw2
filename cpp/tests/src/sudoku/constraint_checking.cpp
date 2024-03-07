@@ -210,6 +210,24 @@ static auto test_unsatisfiable_cell() -> supl::test_results
 {
   supl::test_results results;
 
+  const Sudoku has_unsatisfiable_cells {
+  // clang-format off
+    {
+      '7', '3', '2', '1', '8', '_', '4', '9', '6',
+      '5', '6', '_', '2', '9', '4', '7', '1', '3',
+      '8', '1', '4', '3', '6', '_', '5', '2', '_',
+      '3', '7', '5', '9', '1', '2', '8', '_', '4',
+      '4', '2', '6', '8', '7', '5', '1', '3', '9',
+      '1', '9', '8', '4', '3', '_', '6', '5', '7',
+      '6', '5', '3', '_', '2', '7', '9', '4', '1',
+      '9', '4', '1', '6', '5', '3', '_', '_', '2',
+      '2', '8', '7', '_', '4', '9', '3', '6', '5',
+    }
+  // clang-format on
+  };
+
+  results.enforce_false(has_unsatisfiable_cells.is_valid());
+
   return results;
 }
 
