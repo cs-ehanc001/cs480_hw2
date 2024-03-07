@@ -16,9 +16,50 @@ static auto is_populated(const Sudoku& sudoku) noexcept -> bool
   return std::ranges::find(sudoku.data(), '_') == end(sudoku.data());
 }
 
-static auto is_unsatisfiable_cell(const Sudoku& sudoku) noexcept -> bool
+static auto has_unsatisfiable_cell(const Sudoku& sudoku) noexcept -> bool
 {
-  // stub
+  const auto data_view {sudoku.mdview()};
+
+  std::size_t empty_count {};
+  for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
+    for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
+      if ( data_view(row, col) == '_' ) {
+        ++empty_count;
+      }
+    }
+    if ( empty_count == 1 ) {
+      Sudoku copy {sudoku};
+      return copy.apply_trivial_row_move();
+    }
+    empty_count = 0;
+  }
+
+  for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
+    for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
+      if ( data_view(row, col) == '_' ) {
+        ++empty_count;
+      }
+    }
+    if ( empty_count == 1 ) {
+      Sudoku copy {sudoku};
+      return copy.apply_trivial_column_move();
+    }
+    empty_count = 0;
+  }
+
+  for ( const auto& section : section_table ) {
+    for ( const auto& [row, col] : section ) {
+      if ( data_view(row, col) == '_' ) {
+        ++empty_count;
+      }
+    }
+    if ( empty_count == 1 ) {
+      Sudoku copy {sudoku};
+      return copy.apply_trivial_section_move();
+    }
+    empty_count = 0;
+  }
+
   return false;
 }
 
@@ -133,7 +174,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
     check_iteration.reset();
   }
 
-  return ! is_unsatisfiable_cell(sudoku);
+  return ! has_unsatisfiable_cell(sudoku);
 }
 
 auto Sudoku::is_solved() const noexcept -> bool
