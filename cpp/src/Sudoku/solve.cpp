@@ -104,12 +104,11 @@ auto Sudoku::solve(
 
     // apply optimization if in use (application of forced moves)
     // no-op if not
-    std::ranges::for_each(retval,
-                          [&assignment_count, &optimization_callback](
-                            Search_Node& search_node) {
-                            assignment_count +=
-                              optimization_callback(search_node.sudoku);
-                          });
+    std::ranges::for_each(
+      retval,
+      [&assignment_count, &optimization_callback](Search_Node& new_node) {
+        assignment_count += optimization_callback(new_node.sudoku);
+      });
 
     assignment_count += retval.size();
 
