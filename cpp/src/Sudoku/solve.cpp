@@ -57,7 +57,6 @@ constexpr static std::array all_possible_assignments {[]() {
 }()};
 
 // implemented using dfs
-// no depth limiting required, as infinite loops are impossible
 // backtracking is baked in :)
 auto Sudoku::solve(
   std::add_pointer_t<std::size_t(Sudoku&)> optimization_callback) noexcept
@@ -66,58 +65,89 @@ auto Sudoku::solve(
   using namespace supl::literals::size_t_literal;
   std::size_t assignment_count {};
 
+  constexpr static std::size_t max_depth {50};
+
+  struct Search_Node {
+    Sudoku sudoku;
+    std::size_t depth;
+
+    void to_stream(std::ostream& out) const noexcept
+    {
+      out << '{' << sudoku << depth << '}';
+    }
+  };
+
   // apply any trivial moves available
   assignment_count += optimization_callback(*this);
 
-  auto generate_states {[&assignment_count](const Sudoku& sudoku) {
-    std::deque<Sudoku> retval;
+  auto generate_states {
+    [&assignment_count](const Search_Node& search_node) {
+      std::deque<Search_Node> retval;
 
-    std::ranges::copy(
-      all_possible_assignments
-        | std::views::filter(
-          [&sudoku](const Assignment& assignment) -> bool {
-            return sudoku.is_legal_assignment(assignment);
-          })
-        | std::views::transform([&sudoku](const Assignment& assignment) {
-            return sudoku.assign_copy(assignment);
-          }),
-      std::back_inserter(retval));
+      std::ranges::copy(
+        all_possible_assignments
+          | std::views::filter(
+            [&search_node](const Assignment& assignment) -> bool {
+              return search_node.sudoku.is_legal_assignment(assignment);
+            })
+          | std::views::transform(
+            [&search_node](const Assignment& assignment) -> Search_Node {
+              return {search_node.sudoku.assign_copy(assignment),
+                      search_node.depth + 1};
+            }),
+        std::back_inserter(retval));
 
-    assignment_count += retval.size();
+      assignment_count += retval.size();
 
-    return retval;
-  }};
+      return retval;
+    }};
 
-  std::stack<Sudoku> frontier {generate_states(*this)};
+  std::stack<Search_Node> frontier {generate_states({*this, 0})};
 
   while ( ! frontier.empty() ) {
     // goal check top before expansion
-    if ( frontier.top().is_solved() ) {
-      *this = frontier.top();  // goal achieved! yay!
+    if ( frontier.top().sudoku.is_solved() ) {
+      *this = frontier.top().sudoku;  // goal achieved! yay!
       break;
     }
 
+    // do not exceed maximum depth
+    while ( frontier.top().depth >= max_depth ) {
+      frontier.pop();
+      if ( frontier.empty() ) {
+        std::cerr << "No solution found!\n";
+        exit(EXIT_FAILURE);
+      }
+    }
+
     // generate child nodes
-    std::deque<Sudoku> new_states {generate_states(frontier.top())};
+    std::deque<Search_Node> new_states {generate_states(frontier.top())};
 
     // apply optimization if in use
     // no-op if not
-    std::ranges::for_each(
-      new_states,
-      [&assignment_count, &optimization_callback](Sudoku& sudoku) {
-        assignment_count += optimization_callback(sudoku);
-      });
+    std::ranges::for_each(new_states,
+                          [&assignment_count, &optimization_callback](
+                            Search_Node& search_node) {
+                            assignment_count +=
+                              optimization_callback(search_node.sudoku);
+                          });
 
     std::cout << new_states.size()
               << " New States: " << supl::stream_adapter {new_states}
               << '\n';
 
-    std::cout << "Expanded from: " << frontier.top() << '\n';
+    std::cout << "Expanded from: " << frontier.top().sudoku << '\n';
+
+    assert(! frontier.empty());
+
+    // gotta pop!!
+    frontier.pop();
 
     // copy new states to the frontier
-    std::ranges::for_each(new_states, [&frontier](const Sudoku& sudoku) {
-      frontier.push(sudoku);
-    });
+    std::ranges::for_each(new_states,
+                          [&frontier](const Search_Node& search_node) {
+                            frontier.push(search_node);
+                          });
   }
 
   assert(this->is_solved());
