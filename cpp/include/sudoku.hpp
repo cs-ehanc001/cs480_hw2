@@ -57,6 +57,23 @@ struct variable_domain {
   std::bitset<9> legal_assignments {};
   char value {};
 
+  friend inline auto operator<=>(const variable_domain& lhs,
+                                 const variable_domain& rhs) noexcept
+  {
+    const unsigned long lhs_ulong {lhs.legal_assignments.to_ulong()};
+    const unsigned long rhs_ulong {rhs.legal_assignments.to_ulong()};
+
+    return std::tie(lhs.idxs, lhs_ulong, lhs.value)
+       <=> std::tie(rhs.idxs, rhs_ulong, rhs.value);
+  }
+
+  friend inline auto operator==(const variable_domain&,
+                                const variable_domain&) noexcept
+    -> bool = default;
+  friend inline auto operator<(const variable_domain&,
+                               const variable_domain&) noexcept
+    -> bool = default;
+
   friend inline auto operator<<(std::ostream& out,
                                 const variable_domain& rhs) noexcept
     -> std::ostream&

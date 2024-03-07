@@ -2,6 +2,7 @@
 #include <ranges>
 #include <string_view>
 
+#include <supl/algorithm.hpp>
 #include <supl/utility.hpp>
 
 #include <supl/test_results.hpp>
@@ -74,15 +75,19 @@ static auto get_legal_partial() -> const Sudoku&
   static const Sudoku legal_partial {
     {
      // clang-format off
-  '_', '9', '_', '_', '_', '6', '_', '4', '_',
-  '_', '_', '5', '3', '_', '_', '_', '_', '8',
-  '_', '_', '_', '_', '7', '_', '2', '_', '_',
-  '_', '_', '1', '_', '5', '_', '_', '_', '3',
-  '_', '6', '_', '_', '_', '9', '_', '7', '_',
-  '2', '_', '_', '_', '8', '4', '1', '_', '_',
-  '_', '_', '3', '_', '1', '_', '_', '_', '_',
-  '8', '_', '_', '_', '_', '2', '5', '_', '_',
-  '_', '5', '_', '4', '_', '_', '_', '8', '_'
+//       0    1    2            3    4    5            6    7    8
+/* 0 */ '_', '9', '_', /* 0 */ '_', '_', '6', /* 0 */ '_', '4', '_', /* 0 */
+/* 1 */ '_', '_', '5', /* 1 */ '3', '_', '_', /* 1 */ '_', '_', '8', /* 1 */
+/* 2 */ '_', '_', '_', /* 2 */ '_', '7', '_', /* 2 */ '2', '_', '_', /* 2 */
+//       0    1    2            3    4    5            6    7    8
+/* 3 */ '_', '_', '1', /* 3 */ '_', '5', '_', /* 3 */ '_', '_', '3', /* 3 */
+/* 4 */ '_', '6', '_', /* 4 */ '_', '_', '9', /* 4 */ '_', '7', '_', /* 4 */
+/* 5 */ '2', '_', '_', /* 5 */ '_', '8', '4', /* 5 */ '1', '_', '_', /* 5 */
+//       0    1    2            3    4    5            6    7    8
+/* 6 */ '_', '_', '3', /* 6 */ '_', '1', '_', /* 6 */ '_', '_', '_', /* 6 */
+/* 7 */ '8', '_', '_', /* 7 */ '_', '_', '2', /* 7 */ '5', '_', '_', /* 7 */
+/* 8 */ '_', '5', '_', /* 8 */ '4', '_', '_', /* 8 */ '_', '8', '_'  /* 8 */
+//       0    1    2            3    4    5            6    7    8
      // clang-format on
     }
   };
@@ -226,12 +231,122 @@ static auto test_query_filled_domain() -> supl::test_results
     }
   };
 
+  const auto test_view {test.mdview()};
+
   const auto domains {test.query_domains()};
 
   for ( const auto& domain : domains ) {
     results.enforce_true(domain.legal_assignments.none(),
                          supl::to_string(domain));
+
+    results.enforce_equal(test_view(domain.idxs.row, domain.idxs.col),
+                          test_view(domain.idxs.row, domain.idxs.col),
+                          supl::to_string(domain));
   }
+
+  return results;
+}
+
+static auto test_query_legal_partial_domain() -> supl::test_results
+{
+  supl::test_results results;
+
+  const Sudoku test {get_legal_partial()};
+
+  const auto domains {test.query_domains()};
+
+  decltype(domains) expected_domains {
+    variable_domain {{0, 0}, std::bitset<9> {"001000101"}, '_'},
+    variable_domain {{0, 1}, std::bitset<9> {"000000000"}, '9'},
+    variable_domain {{0, 2}, std::bitset<9> {"011000010"}, '_'},
+    variable_domain {{0, 3}, std::bitset<9> {"010010011"}, '_'},
+    variable_domain {{0, 4}, std::bitset<9> {"000000010"}, '_'},
+    variable_domain {{0, 5}, std::bitset<9> {"000000000"}, '6'},
+    variable_domain {{0, 6}, std::bitset<9> {"001000100"}, '_'},
+    variable_domain {{0, 7}, std::bitset<9> {"000000000"}, '4'},
+    variable_domain {{0, 8}, std::bitset<9> {"001010001"}, '_'},
+ /* variable_domain {{1, 0}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{1, 1}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{1, 2}, std::bitset<9> {"000000000"}, '5'}, */
+  /* variable_domain {{1, 3}, std::bitset<9> {"000000000"}, '3'}, */
+  /* variable_domain {{1, 4}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{1, 5}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{1, 6}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{1, 7}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{1, 8}, std::bitset<9> {"000000000"}, '8'}, */
+  /* variable_domain {{2, 0}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{2, 1}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{2, 2}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{2, 3}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{2, 4}, std::bitset<9> {"000000000"}, '7'}, */
+  /* variable_domain {{2, 5}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{2, 6}, std::bitset<9> {"000000000"}, '2'}, */
+  /* variable_domain {{2, 7}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{2, 8}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{3, 0}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{3, 1}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{3, 2}, std::bitset<9> {"000000000"}, '1'}, */
+  /* variable_domain {{3, 3}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{3, 4}, std::bitset<9> {"000000000"}, '5'}, */
+  /* variable_domain {{3, 5}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{3, 6}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{3, 7}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{3, 8}, std::bitset<9> {"000000000"}, '3'}, */
+  /* variable_domain {{4, 0}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{4, 1}, std::bitset<9> {"000000000"}, '6'}, */
+  /* variable_domain {{4, 2}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{4, 3}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{4, 4}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{4, 5}, std::bitset<9> {"000000000"}, '9'}, */
+  /* variable_domain {{4, 6}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{4, 7}, std::bitset<9> {"000000000"}, '7'}, */
+  /* variable_domain {{4, 8}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{5, 0}, std::bitset<9> {"000000000"}, '2'}, */
+  /* variable_domain {{5, 1}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{5, 2}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{5, 3}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{5, 4}, std::bitset<9> {"000000000"}, '8'}, */
+  /* variable_domain {{5, 5}, std::bitset<9> {"000000000"}, '4'}, */
+  /* variable_domain {{5, 6}, std::bitset<9> {"000000000"}, '1'}, */
+  /* variable_domain {{5, 7}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{5, 8}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{6, 0}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{6, 1}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{6, 2}, std::bitset<9> {"000000000"}, '3'}, */
+  /* variable_domain {{6, 3}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{6, 4}, std::bitset<9> {"000000000"}, '1'}, */
+  /* variable_domain {{6, 5}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{6, 6}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{6, 7}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{6, 8}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{7, 0}, std::bitset<9> {"000000000"}, '8'}, */
+  /* variable_domain {{7, 1}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{7, 2}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{7, 3}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{7, 4}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{7, 5}, std::bitset<9> {"000000000"}, '2'}, */
+  /* variable_domain {{7, 6}, std::bitset<9> {"000000000"}, '5'}, */
+  /* variable_domain {{7, 7}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{7, 8}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{8, 0}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{8, 1}, std::bitset<9> {"000000000"}, '5'}, */
+  /* variable_domain {{8, 2}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{8, 3}, std::bitset<9> {"000000000"}, '4'}, */
+  /* variable_domain {{8, 4}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{8, 5}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{8, 6}, std::bitset<9> {"111111111"}, '_'}, */
+  /* variable_domain {{8, 7}, std::bitset<9> {"000000000"}, '8'}, */
+  /* variable_domain {{8, 8}, std::bitset<9> {"111111111"}, '_'}, */
+  };
+
+  supl::for_each_both(
+    domains.begin(),
+    domains.begin() + 8,
+    expected_domains.begin(),
+    expected_domains.end(),
+    [&results](const auto& result, const auto& expected) {
+      results.enforce_equal(result, expected);
+    });
 
   return results;
 }
@@ -250,6 +365,8 @@ static auto constraint_checking() -> supl::test_section
                    &test_section_violation_in_partial_board);
   section.add_test("is_legal_assignment", &test_is_legal_assignment);
   section.add_test("domain query - filled", &test_query_filled_domain);
+  section.add_test("domain query - legal partial",
+                   &test_query_legal_partial_domain);
 
   return section;
 }
