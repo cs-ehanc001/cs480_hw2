@@ -16,52 +16,6 @@ static auto is_populated(const Sudoku& sudoku) noexcept -> bool
   return std::ranges::find(sudoku.data(), '_') == end(sudoku.data());
 }
 
-static auto has_unsatisfiable_cell(const Sudoku& sudoku) noexcept -> bool
-{
-  const auto data_view {sudoku.mdview()};
-
-  std::size_t empty_count {};
-  for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
-    for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
-      if ( data_view(row, col) == '_' ) {
-        ++empty_count;
-      }
-    }
-    if ( empty_count == 1 ) {
-      /* return */
-    }
-    empty_count = 0;
-  }
-
-  /* for ( const std::size_t col : std::views::iota(0_z, 9_z) ) { */
-  /*   for ( const std::size_t row : std::views::iota(0_z, 9_z) ) { */
-  /*     if ( data_view(row, col) == '_' ) { */
-  /*       ++empty_count; */
-  /*     } */
-  /*   } */
-  /*   if ( empty_count == 1 ) { */
-  /*     Sudoku copy {sudoku}; */
-  /*     return copy.apply_trivial_column_move(); */
-  /*   } */
-  /*   empty_count = 0; */
-  /* } */
-
-  /* for ( const auto& section : section_table ) { */
-  /*   for ( const auto& [row, col] : section ) { */
-  /*     if ( data_view(row, col) == '_' ) { */
-  /*       ++empty_count; */
-  /*     } */
-  /*   } */
-  /*   if ( empty_count == 1 ) { */
-  /*     Sudoku copy {sudoku}; */
-  /*     return copy.apply_trivial_section_move(); */
-  /*   } */
-  /*   empty_count = 0; */
-  /* } */
-
-  return false;
-}
-
 // anonymous namespace to enforce internal linkage
 namespace {
 // function object implementing a single cell check
@@ -117,6 +71,50 @@ struct check_iteration_handler {
   }
 };
 }  // namespace
+
+template <std::size_t Size>
+static auto pos_of_lowest_unset_bit(const std::bitset<Size> bitset) -> long
+{ }
+
+static auto has_unsatisfiable_cell(const Sudoku& sudoku) noexcept -> bool
+{
+  const auto data_view {sudoku.mdview()};
+
+  check_iteration_handler check_iteration {};
+  std::size_t empty_count {};
+
+  std::size_t outer_row {};
+  std::size_t outer_col {};
+  for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
+    for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
+      const char cell {data_view(row, col)};
+      if ( cell == '_' ) {
+        ++empty_count;
+        outer_row = row;
+        outer_col = col;
+        continue;
+      }
+      check_iteration(cell);
+    }
+
+    if ( empty_count == 1 ) {
+
+      assert(std::popcount(check_iteration.check_table.to_ulong()) == 7);
+
+      // guaranteed ok by the above assert
+      const char value {static_cast<char>(
+        pos_of_lowest_unset_bit(check_iteration.check_table) + '0' + 1)};
+
+      if ( ! sudoku.is_legal_assignment({outer_row, outer_col}, value) ) {
+        return true;
+      }
+    }
+
+    check_iteration.reset();
+  }
+
+  return false;
+}
 
 // Only determines if constraints are intact
 // A partially-filled board which does not violate constraints will return true
