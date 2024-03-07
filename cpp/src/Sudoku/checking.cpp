@@ -209,14 +209,98 @@ auto Sudoku::is_legal_assignment(const index_pair idxs,
 
 ///////////////////////////////////////////// DOMAINS
 
-struct variable_domain {
-  index_pair idxs {};
-  std::bitset<9> legal_assignments {};
-};
-
 // get remaining domain of each unassigned variable
 // and check for any variable with a null domain
 //
 // find '_' and save positions,
 // trim down domain by walking the enclosing row, col, and section
 
+auto Sudoku::query_domains() const noexcept
+  -> std::array<variable_domain, 81>
+{
+  std::array<variable_domain, 81> domains;
+  Kokkos::mdspan<variable_domain, Kokkos::extents<std::size_t, 9, 9>>
+    domain_view {domains.data()};
+
+  const auto board_view {this->mdview()};
+
+  // initialize
+  for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
+    for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
+      domain_view(row, col) = {
+        {row, col},
+        {}, // default-constructed bitset is all 0s
+        board_view(row, col)
+      };
+    }
+  }
+
+  // set domain for unassigned cells (will be reduced)
+  for ( auto& domain : domains ) {
+    if ( domain.value == '_' ) {
+      domain.legal_assignments.reset();
+      domain.legal_assignments.flip();
+    }
+  }
+
+  // reduce by row
+  for ( auto& domain : domains ) {
+    // skip assigned cells
+    if ( domain.value != '_' ) {
+      continue;
+    }
+
+    const std::size_t row {domain.idxs.row};
+    for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
+      // assigned cell means domain may be able to be reduced
+      const char cell_value {board_view(row, col)};
+      if ( cell_value != '_' ) {
+        domain.legal_assignments.reset(
+          static_cast<std::size_t>(cell_value - '0' - 1));
+      }
+    }
+  }
+
+  // reduce by column
+  for ( auto& domain : domains ) {
+    // skip assigned cells
+    if ( domain.value != '_' ) {
+      continue;
+    }
+
+    const std::size_t col {domain.idxs.col};
+    for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
+      // assigned cell means domain may be able to be reduced
+      const char cell_value {board_view(row, col)};
+      if ( cell_value != '_' ) {
+        domain.legal_assignments.reset(
+          static_cast<std::size_t>(cell_value - '0' - 1));
+      }
+    }
+  }
+
+  // reduce by section
+  for ( auto& domain : domains ) {
+    // get subtable in section_table which contains indices in question
+    const auto& section_subtable {[&]() {
+      for ( const auto& subtable : section_table ) {
+        if ( std::ranges::find(subtable, domain.idxs) != subtable.end() ) {
+          return subtable;
+        }
+      }
+      assert(false);
+    }()};  // Immediately Invoked Lambda Expression
+
+    // walk the subtable of section indices
+    for ( const auto& [row, col] : section_subtable ) {
+      // assigned cell means domain may be able to be reduced
+      const char cell_value {board_view(row, col)};
+      if ( cell_value != '_' ) {
+        domain.legal_assignments.reset(
+          static_cast<std::size_t>(cell_value - '0' - 1));
+      }
+    }
+  }
+
+  return domains;
+}

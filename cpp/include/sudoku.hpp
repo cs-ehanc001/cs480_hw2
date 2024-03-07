@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <array>
+#include <bitset>
 #include <cstddef>
 #include <iostream>
 #include <iterator>
@@ -46,6 +47,22 @@ struct Assignment {
   {
     out << supl::stream_adapter {
       std::pair {rhs.idxs, rhs.value}
+    };
+    return out;
+  }
+};
+
+struct variable_domain {
+  index_pair idxs {};
+  std::bitset<9> legal_assignments {};
+  char value {};
+
+  friend inline auto operator<<(std::ostream& out,
+                                const variable_domain& rhs) noexcept
+    -> std::ostream&
+  {
+    out << supl::stream_adapter {
+      std::tuple {rhs.idxs, rhs.legal_assignments, rhs.value}
     };
     return out;
   }
@@ -169,6 +186,9 @@ public:
   [[nodiscard]] auto solve(std::add_pointer_t<std::size_t(Sudoku&)>
                              optimization_callback) noexcept
     -> std::size_t;
+
+  [[nodiscard]] auto query_domains() const noexcept
+    -> std::array<variable_domain, 81>;
 
   friend auto operator<=>(const Sudoku& lhs,
                           const Sudoku& rhs) noexcept = default;
