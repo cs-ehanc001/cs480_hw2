@@ -148,6 +148,7 @@ auto Sudoku::solve(
               << '\n';
 
     std::cout << "Expanded from: " << frontier.top().sudoku << '\n';
+    std::cout << "Assignments: " << assignment_count << '\n';
 
     careful_pop();
 
