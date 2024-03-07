@@ -110,7 +110,6 @@ auto Sudoku::solve(
       exit(EXIT_FAILURE);
     }
 
-    // gotta pop!!
     std::cout << "POP!\n";
     frontier.pop();
   }};
