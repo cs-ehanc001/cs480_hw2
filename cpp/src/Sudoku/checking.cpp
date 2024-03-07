@@ -28,37 +28,36 @@ static auto has_unsatisfiable_cell(const Sudoku& sudoku) noexcept -> bool
       }
     }
     if ( empty_count == 1 ) {
-      Sudoku copy {sudoku};
-      return copy.apply_trivial_row_move();
+      /* return */
     }
     empty_count = 0;
   }
 
-  for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
-    for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
-      if ( data_view(row, col) == '_' ) {
-        ++empty_count;
-      }
-    }
-    if ( empty_count == 1 ) {
-      Sudoku copy {sudoku};
-      return copy.apply_trivial_column_move();
-    }
-    empty_count = 0;
-  }
+  /* for ( const std::size_t col : std::views::iota(0_z, 9_z) ) { */
+  /*   for ( const std::size_t row : std::views::iota(0_z, 9_z) ) { */
+  /*     if ( data_view(row, col) == '_' ) { */
+  /*       ++empty_count; */
+  /*     } */
+  /*   } */
+  /*   if ( empty_count == 1 ) { */
+  /*     Sudoku copy {sudoku}; */
+  /*     return copy.apply_trivial_column_move(); */
+  /*   } */
+  /*   empty_count = 0; */
+  /* } */
 
-  for ( const auto& section : section_table ) {
-    for ( const auto& [row, col] : section ) {
-      if ( data_view(row, col) == '_' ) {
-        ++empty_count;
-      }
-    }
-    if ( empty_count == 1 ) {
-      Sudoku copy {sudoku};
-      return copy.apply_trivial_section_move();
-    }
-    empty_count = 0;
-  }
+  /* for ( const auto& section : section_table ) { */
+  /*   for ( const auto& [row, col] : section ) { */
+  /*     if ( data_view(row, col) == '_' ) { */
+  /*       ++empty_count; */
+  /*     } */
+  /*   } */
+  /*   if ( empty_count == 1 ) { */
+  /*     Sudoku copy {sudoku}; */
+  /*     return copy.apply_trivial_section_move(); */
+  /*   } */
+  /*   empty_count = 0; */
+  /* } */
 
   return false;
 }
@@ -174,7 +173,7 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
     check_iteration.reset();
   }
 
-  return ! has_unsatisfiable_cell(sudoku);
+  return true;
 }
 
 auto Sudoku::is_solved() const noexcept -> bool
@@ -184,7 +183,7 @@ auto Sudoku::is_solved() const noexcept -> bool
 
 auto Sudoku::is_valid() const noexcept -> bool
 {
-  return is_legal_state(*this);
+  return is_legal_state(*this) && (! has_unsatisfiable_cell(*this));
 }
 
 auto Sudoku::is_legal_assignment(const index_pair idxs,
@@ -211,7 +210,7 @@ auto Sudoku::is_legal_assignment(const index_pair idxs,
   assert(raw_idx <= 8);
   assert(supl::to_string(raw_idx + 1) == supl::to_string(value));
 
-  // index for
+  // index for check table entry for hypothetical application of this assignment
   const std::size_t idx {static_cast<std::size_t>(raw_idx)};
 
   // check across column
