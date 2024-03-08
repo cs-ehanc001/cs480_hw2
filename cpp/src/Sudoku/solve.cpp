@@ -64,9 +64,11 @@ auto Sudoku::solve(
   // (should be checked above)
   assert(first_unassigned_variable.legal_assignments.any());
 
-  const Assignment first_assignment {
-    [&first_unassigned_variable]() -> Assignment {
+  const std::vector<Assignment> possible_assignments {
+    [&first_unassigned_variable]() -> std::vector<Assignment> {
       std::cout << "Domain: " << first_unassigned_variable << '\n';
+
+      std::vector<Assignment> retval {};
 
       for ( const unsigned long bit : std::views::iota(0UL, 9UL) ) {
 
@@ -81,24 +83,32 @@ auto Sudoku::solve(
           assert(value >= '1');
           assert(value <= '9');
 
-          return {first_unassigned_variable.idxs, value};
+          retval.emplace_back(first_unassigned_variable.idxs, value);
         }
       }
+
+      return retval;
     }()};  // Immediately Invoked Lambda Expression
 
-  std::cout << first_assignment << '\n';
+  for ( const Assignment& assignment : possible_assignments ) {
+    Sudoku next {this->assign_copy(assignment)};
+    ++assignment_count;
 
-  Sudoku next {this->assign_copy(first_assignment)};
-  ++assignment_count;
+    std::cout << "Next: " << next << std::boolalpha << next.is_solved()
+              << '\n';
 
-  std::cout << "Next: " << next << std::boolalpha << next.is_solved()
-            << '\n';
+    if ( next.is_solved() ) {  // yay!
+      *this = next;
+      return {assignment_count, true};
+    }
 
-  if ( next.is_solved() ) {  // yay!
-    *this = next;
-    return {assignment_count, true};
+    const auto [increased_count,
+                is_solved] {next.solve(optimization_callback)};
+
+    if ( is_solved ) {
+      assert(next.is_solved());
+      *this = next;
+      return {assignment_count + increased_count, true};
+    }
   }
-
-  const auto [more_assignments,
-              keep_going] {next.solve(optimization_callback)};
 }
