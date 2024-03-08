@@ -191,15 +191,6 @@ public:
   // returns true if move was applied, returns false if no trivial move exists
   [[nodiscard]] auto apply_trivial_move() noexcept -> bool;
 
-  // apply only trivial move based on row constraints (mostly for testing purposes)
-  [[nodiscard]] auto apply_trivial_row_move() noexcept -> bool;
-
-  // apply only trivial move based on column constraints (mostly for testing purposes)
-  [[nodiscard]] auto apply_trivial_column_move() noexcept -> bool;
-
-  // apply only trivial move based on section constraints (mostly for testing purposes)
-  [[nodiscard]] auto apply_trivial_section_move() noexcept -> bool;
-
   [[nodiscard]] auto solve(std::add_pointer_t<std::size_t(Sudoku&)>
                              optimization_callback) noexcept
     -> std::size_t;
