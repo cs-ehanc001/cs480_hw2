@@ -305,7 +305,8 @@ auto Sudoku::query_domains() const noexcept
   return domains;
 }
 
-auto Sudoku::is_possible() const noexcept -> bool
+// determines if legal assignments exist
+auto Sudoku::has_legal_assignments() const noexcept -> bool
 {
 
   const auto domains {this->query_domains()};

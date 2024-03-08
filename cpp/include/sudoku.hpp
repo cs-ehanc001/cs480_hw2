@@ -198,7 +198,7 @@ public:
   [[nodiscard]] auto query_domains() const noexcept
     -> std::array<variable_domain, 81>;
 
-  [[nodiscard]] auto is_possible() const noexcept -> bool;
+  [[nodiscard]] auto has_legal_assignments() const noexcept -> bool;
 
   friend auto operator<=>(const Sudoku& lhs,
                           const Sudoku& rhs) noexcept = default;
