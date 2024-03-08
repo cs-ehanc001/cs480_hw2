@@ -5,9 +5,11 @@
 #include <deque>
 #include <iterator>
 #include <ranges>
+#include <set>
 #include <stack>
 #include <type_traits>
 
+#include <supl/predicates.hpp>
 #include <supl/utility.hpp>
 
 #include "sudoku.hpp"
@@ -55,6 +57,19 @@ constexpr static std::array all_possible_assignments {[]() {
   return retval;
 }()};
 
+static_assert(std::ranges::all_of(all_possible_assignments,
+                                  [](const Assignment& assignment) {
+                                    constexpr auto idx_pred {
+                                      supl::less_eq(8)};
+
+                                    constexpr auto value_pred {
+                                      supl::between('1', '9')};
+
+                                    return idx_pred(assignment.idxs.row)
+                                        && idx_pred(assignment.idxs.col)
+                                        && value_pred(assignment.value);
+                                  }));
+
 // implemented using dfs
 // backtracking is baked in :)
 auto Sudoku::solve(
@@ -64,6 +79,8 @@ auto Sudoku::solve(
   std::size_t assignment_count {};
 
   constexpr static std::size_t max_depth {50};
+
+  std::set<Assignment> tried_assignments {};
 
   struct Search_Node {
     Sudoku sudoku;
@@ -78,29 +95,43 @@ auto Sudoku::solve(
   // apply any trivial moves available
   assignment_count += optimization_callback(*this);
 
-  auto generate_states {[&assignment_count, &optimization_callback](
+  auto generate_states {[&assignment_count,
+                         &optimization_callback,
+                         &tried_assignments](
                           const Search_Node& search_node) {
     std::deque<Search_Node> retval;
 
     std::ranges::copy(
       all_possible_assignments
+        // filter out illegal assignments
         | std::views::filter(
           [&search_node](const Assignment& assignment) -> bool {
             return search_node.sudoku.is_legal_assignment(assignment);
           })
+        // filter out repeated assignments
+        /* | std::views::filter( */
+        /*   [&tried_assignments](const Assignment& assignment) -> bool { */
+        /*     return ! tried_assignments.contains(assignment); */
+        /*   }) */
+        // perform the assignments
         | std::views::transform(
-          [&search_node](const Assignment& assignment) -> Search_Node {
+          [&search_node, &tried_assignments](
+            const Assignment& assignment) -> Search_Node {
+            tried_assignments.insert(assignment);
             return {search_node.sudoku.assign_copy(assignment),
                     search_node.depth + 1};
           })
+        // filter out invalid states
         | std::views::filter([](const Search_Node& new_node) -> bool {
             return new_node.sudoku.is_valid();
           })
+        // only accept boards that are either solved or
+        // still have legal assignments to be made
         | std::views::filter([](const Search_Node& new_node) -> bool {
             const Sudoku& sudoku {new_node.sudoku};
             return sudoku.is_solved() || sudoku.has_legal_assignments();
           })
-        | std::views::reverse,
+        | std::views::reverse | std::views::common,
       std::back_inserter(retval));
 
     // apply optimization if in use (application of forced moves)
@@ -149,12 +180,13 @@ auto Sudoku::solve(
       careful_pop();
     }
 
-    /* std::cout << new_states.size() */
-    /*           << " New States: " << supl::stream_adapter {new_states} */
-    /*           << '\n'; */
+    std::cout << new_states.size()
+              << " New States: " << supl::stream_adapter {new_states}
+              << '\n';
 
     std::cout << "Expanded from: " << frontier.top().sudoku << '\n';
     std::cout << "Assignments: " << assignment_count << '\n';
+    std::cout << std::flush;
 
     careful_pop();
 
