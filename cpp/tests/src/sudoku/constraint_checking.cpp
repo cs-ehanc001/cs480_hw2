@@ -351,6 +351,48 @@ static auto test_query_legal_partial_domain() -> supl::test_results
   return results;
 }
 
+static auto test_has_legal_assignments() -> supl::test_results
+{
+  supl::test_results results;
+
+  const Sudoku hard {
+    {
+     // clang-format off
+'7', '_', '_', '_', '_', '_', '_', '_', '_',
+'6', '_', '_', '4', '1', '_', '2', '5', '_',
+'_', '1', '3', '_', '9', '5', '_', '_', '_',
+'8', '6', '_', '_', '_', '_', '_', '_', '_',
+'3', '_', '1', '_', '_', '_', '4', '_', '5',
+'_', '_', '_', '_', '_', '_', '_', '8', '6',
+'_', '_', '_', '8', '4', '_', '5', '3', '_',
+'_', '4', '2', '_', '3', '6', '_', '_', '7',
+'_', '_', '_', '_', '_', '_', '_', '_', '9',
+     // clang-format on
+    }
+  };
+
+  const Sudoku impossible {
+    {
+     // clang-format off
+'7', '3', '2', '1', '8', '_', '4', '9', '6',
+'5', '6', '_', '2', '9', '4', '7', '1', '3',
+'8', '1', '4', '3', '6', '_', '5', '2', '_',
+'3', '7', '5', '9', '1', '2', '8', '_', '4',
+'4', '2', '6', '8', '7', '5', '1', '3', '9',
+'1', '9', '8', '4', '3', '_', '6', '5', '7',
+'6', '5', '3', '_', '2', '7', '9', '4', '1',
+'9', '4', '1', '6', '5', '3', '_', '7', '2',
+'2', '8', '_', '_', '4', '_', '3', '6', '5',
+     // clang-format on
+    }
+  };
+
+  results.enforce_true(hard.has_legal_assignments());
+  results.enforce_false(impossible.has_legal_assignments());
+
+  return results;
+}
+
 static auto constraint_checking() -> supl::test_section
 {
   supl::test_section section;
@@ -367,6 +409,7 @@ static auto constraint_checking() -> supl::test_section
   section.add_test("domain query - filled", &test_query_filled_domain);
   section.add_test("domain query - legal partial",
                    &test_query_legal_partial_domain);
+  section.add_test("has_legal_assignments", &test_has_legal_assignments);
 
   return section;
 }
