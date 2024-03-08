@@ -90,12 +90,14 @@ auto Sudoku::solve(
       return retval;
     }()};  // Immediately Invoked Lambda Expression
 
+  std::cout << "Possible assignments: "
+            << supl::stream_adapter {possible_assignments} << '\n';
+
   for ( const Assignment& assignment : possible_assignments ) {
     Sudoku next {this->assign_copy(assignment)};
     ++assignment_count;
 
-    std::cout << "Next: " << next << std::boolalpha << next.is_solved()
-              << '\n';
+    std::cout << "Next: " << next << '\n';
 
     if ( next.is_solved() ) {  // yay!
       *this = next;
@@ -104,11 +106,12 @@ auto Sudoku::solve(
 
     const auto [increased_count,
                 is_solved] {next.solve(optimization_callback)};
+    assignment_count += increased_count;
 
     if ( is_solved ) {
       assert(next.is_solved());
       *this = next;
-      return {assignment_count + increased_count, true};
+      return {assignment_count, true};
     }
   }
 }
