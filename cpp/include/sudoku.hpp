@@ -193,7 +193,7 @@ public:
 
   [[nodiscard]] auto solve(std::add_pointer_t<std::size_t(Sudoku&)>
                              optimization_callback) noexcept
-    -> std::size_t;
+    -> std::pair<std::size_t, bool>;
 
   [[nodiscard]] auto query_domains() const noexcept
     -> std::array<variable_domain, 81>;

@@ -71,15 +71,20 @@ auto main(const int argc, const char* const* const argv) -> int
 
   const auto start_time {std::chrono::steady_clock::now()};
 
-  const std::size_t assignment_count {sudoku.solve(optimization_callback)};
+  const auto [assignment_count,
+              solved] {sudoku.solve(optimization_callback)};
 
   const auto end_time {std::chrono::steady_clock::now()};
 
-  std::cout << "Solution state:\n" << sudoku << "\n\n";
-  std::cout << "Solution found with: " << assignment_count
-            << " variable assignments\n";
+  if ( solved ) {
+    std::cout << "Solution state:\n" << sudoku << "\n\n";
+    std::cout << "Solution found with: " << assignment_count
+              << " variable assignments\n";
+  } else {
+    std::cout << "No solution found" << '\n';
+  }
 
-  std::cout << "Solution took: "
+  std::cout << "Took: "
             << std::chrono::duration_cast<std::chrono::microseconds>(
                  end_time - start_time)
                  .count()
