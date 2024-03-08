@@ -304,3 +304,24 @@ auto Sudoku::query_domains() const noexcept
 
   return domains;
 }
+
+auto Sudoku::is_possible() const noexcept -> bool
+{
+
+  const auto domains {this->query_domains()};
+
+  for ( const auto& domain : domains ) {
+    // skip populated cells
+    if ( domain.value != '_' ) {
+      continue;
+    }
+
+    // cell value == '_' therefore is unpopulated
+
+    if ( domain.legal_assignments.none() ) {
+      return false;
+    }
+  }
+
+  return true;
+}
