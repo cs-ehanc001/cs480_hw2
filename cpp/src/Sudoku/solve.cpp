@@ -122,14 +122,11 @@ auto Sudoku::solve(
                     search_node.depth + 1};
           })
         // filter out invalid states
-        | std::views::filter([](const Search_Node& new_node) -> bool {
-            return new_node.sudoku.is_valid();
-          })
-        // only accept boards that are either solved or
-        // still have legal assignments to be made
+        // and accept only boards which have legal assignments
         | std::views::filter([](const Search_Node& new_node) -> bool {
             const Sudoku& sudoku {new_node.sudoku};
-            return sudoku.is_solved() || sudoku.has_legal_assignments();
+            return (sudoku.is_solved() || sudoku.has_legal_assignments())
+                && new_node.sudoku.is_valid();
           })
         | std::views::reverse | std::views::common,
       std::back_inserter(retval));
