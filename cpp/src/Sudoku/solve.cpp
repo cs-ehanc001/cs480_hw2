@@ -99,6 +99,10 @@ auto Sudoku::solve(
         | std::views::filter([](const Search_Node& new_node) -> bool {
             return new_node.sudoku.is_valid();
           })
+        | std::views::filter([](const Search_Node& new_node) -> bool {
+            const Sudoku& sudoku {new_node.sudoku};
+            return sudoku.is_solved() || sudoku.has_legal_assignments();
+          })
         | std::views::reverse,
       std::back_inserter(retval));
 
