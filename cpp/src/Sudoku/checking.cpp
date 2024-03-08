@@ -9,8 +9,6 @@
 #include "section_table.hpp"
 #include "sudoku.hpp"
 
-using supl::size_t_literal::operator""_z;
-
 static auto is_populated(const Sudoku& sudoku) noexcept -> bool
 {
   return std::ranges::find(sudoku.data(), '_') == end(sudoku.data());
@@ -47,7 +45,7 @@ struct check_iteration_handler {
     assert(raw_idx <= 8);
     assert(supl::to_string(raw_idx + 1) == supl::to_string(cell));
 
-    const std::size_t idx {static_cast<std::size_t>(raw_idx)};
+    const unsigned idx {static_cast<unsigned>(raw_idx)};
 
     // duplicate checking: if '2' appears twice,
     // check_table[1] will already be set
@@ -65,7 +63,7 @@ struct check_iteration_handler {
     check_table.reset();
   }
 
-  void set(std::size_t idx) noexcept
+  void set(unsigned idx) noexcept
   {
     check_table.set(idx);
   }
@@ -84,8 +82,8 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
 
   // check row-wise
 
-  for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
-    for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
+  for ( const unsigned row : std::views::iota(0U, 9U) ) {
+    for ( const unsigned col : std::views::iota(0U, 9U) ) {
       if ( ! check_iteration(data_view(row, col)) ) {
         return false;
       }
@@ -103,8 +101,8 @@ static auto is_legal_state(const Sudoku& sudoku) noexcept -> bool
   }
 
   // check column-wise
-  for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
-    for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
+  for ( const unsigned col : std::views::iota(0U, 9U) ) {
+    for ( const unsigned row : std::views::iota(0U, 9U) ) {
       if ( ! check_iteration(data_view(row, col)) ) {
         return false;
       }
@@ -165,11 +163,11 @@ auto Sudoku::is_legal_assignment(const index_pair idxs,
   assert(supl::to_string(raw_idx + 1) == supl::to_string(value));
 
   // index for
-  const std::size_t idx {static_cast<std::size_t>(raw_idx)};
+  const unsigned idx {static_cast<unsigned>(raw_idx)};
 
   // check across column
   check_iteration.set(idx);
-  for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
+  for ( const unsigned row : std::views::iota(0U, 9U) ) {
     if ( ! check_iteration(data_view(row, idxs.col)) ) {
       return false;
     }
@@ -178,7 +176,7 @@ auto Sudoku::is_legal_assignment(const index_pair idxs,
   check_iteration.reset();
 
   check_iteration.set(idx);
-  for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
+  for ( const unsigned col : std::views::iota(0U, 9U) ) {
     if ( ! check_iteration(data_view(idxs.row, col)) ) {
       return false;
     }
@@ -219,14 +217,14 @@ auto Sudoku::query_domains() const noexcept
   -> std::array<variable_domain, 81>
 {
   std::array<variable_domain, 81> domains;
-  Kokkos::mdspan<variable_domain, Kokkos::extents<std::size_t, 9, 9>>
+  Kokkos::mdspan<variable_domain, Kokkos::extents<unsigned, 9, 9>>
     domain_view {domains.data()};
 
   const auto board_view {this->mdview()};
 
   // initialize
-  for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
-    for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
+  for ( const unsigned row : std::views::iota(0U, 9U) ) {
+    for ( const unsigned col : std::views::iota(0U, 9U) ) {
       domain_view(row, col) = {
         {row, col},
         {}, // default-constructed bitset is all 0s
@@ -250,13 +248,13 @@ auto Sudoku::query_domains() const noexcept
       continue;
     }
 
-    const std::size_t row {domain.idxs.row};
-    for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
+    const unsigned row {domain.idxs.row};
+    for ( const unsigned col : std::views::iota(0U, 9U) ) {
       // assigned cell means domain may be able to be reduced
       const char cell_value {board_view(row, col)};
       if ( cell_value != '_' ) {
         domain.legal_assignments.reset(
-          static_cast<std::size_t>(cell_value - '0' - 1));
+          static_cast<unsigned>(cell_value - '0' - 1));
       }
     }
   }
@@ -268,13 +266,13 @@ auto Sudoku::query_domains() const noexcept
       continue;
     }
 
-    const std::size_t col {domain.idxs.col};
-    for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
+    const unsigned col {domain.idxs.col};
+    for ( const unsigned row : std::views::iota(0U, 9U) ) {
       // assigned cell means domain may be able to be reduced
       const char cell_value {board_view(row, col)};
       if ( cell_value != '_' ) {
         domain.legal_assignments.reset(
-          static_cast<std::size_t>(cell_value - '0' - 1));
+          static_cast<unsigned>(cell_value - '0' - 1));
       }
     }
   }
@@ -297,7 +295,7 @@ auto Sudoku::query_domains() const noexcept
       const char cell_value {board_view(row, col)};
       if ( cell_value != '_' ) {
         domain.legal_assignments.reset(
-          static_cast<std::size_t>(cell_value - '0' - 1));
+          static_cast<unsigned>(cell_value - '0' - 1));
       }
     }
   }

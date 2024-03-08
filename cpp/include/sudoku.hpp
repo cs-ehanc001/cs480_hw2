@@ -16,8 +16,8 @@
 #include <mdspan/mdspan.hpp>
 
 struct index_pair {
-  std::size_t row;
-  std::size_t col;
+  unsigned row;
+  unsigned col;
 
   friend inline auto operator<=>(const index_pair&,
                                  const index_pair&) noexcept = default;
@@ -133,7 +133,7 @@ public:
   template <bool is_const>
   using mdview_t =
     Kokkos::mdspan<supl::apply_if_t<is_const, std::add_const, char>,
-                   Kokkos::extents<std::size_t, 9, 9>>;
+                   Kokkos::extents<unsigned short, 9, 9>>;
 
   [[nodiscard]] auto mdview() noexcept -> mdview_t<false>
   {

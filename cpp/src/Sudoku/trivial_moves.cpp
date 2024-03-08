@@ -6,8 +6,6 @@
 
 #include "sudoku.hpp"
 
-using namespace supl::literals::size_t_literal;
-
 // applies exactly one trivial move (only one possible value)
 // returned bool indicates whether an assignment was made
 auto Sudoku::apply_trivial_move() noexcept -> bool

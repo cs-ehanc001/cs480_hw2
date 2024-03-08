@@ -11,8 +11,6 @@
 
 #include "sudoku.hpp"
 
-using namespace supl::literals::size_t_literal;
-
 static auto test_checking_of_populated_board() -> supl::test_results
 {
   supl::test_results results;
@@ -36,8 +34,8 @@ static auto test_checking_of_populated_board() -> supl::test_results
   results.enforce_true(legal.is_solved());
 
   // create a failure in each cell
-  for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
-    for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
+  for ( const unsigned row : std::views::iota(0U, 9U) ) {
+    for ( const unsigned col : std::views::iota(0U, 9U) ) {
       Sudoku illegal {legal};
       char& fail_point = illegal.mdview()(row, col);
 

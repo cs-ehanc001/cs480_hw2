@@ -29,21 +29,19 @@ auto trivial_move_optimization(Sudoku& sudoku) -> std::size_t
 
 // compile-time generation of every possible variable assignment
 constexpr static std::array all_possible_assignments {[]() {
-  using namespace supl::literals::size_t_literal;
-
   std::array<Assignment,
              []() {
                constexpr auto square {[](const auto value) {
                  return value * value;
                }};
-               return square(std::ranges::size(std::views::iota(0_z, 9_z)))
+               return square(std::ranges::size(std::views::iota(0U, 9U)))
                     * std::ranges::size(std::views::iota('1', '9' + 1));
              }()>
     retval {};
 
-  std::size_t idx {};
-  for ( const std::size_t row : std::views::iota(0_z, 9_z) ) {
-    for ( const std::size_t col : std::views::iota(0_z, 9_z) ) {
+  unsigned idx {};
+  for ( const unsigned row : std::views::iota(0U, 9U) ) {
+    for ( const unsigned col : std::views::iota(0U, 9U) ) {
       for ( const char value : std::views::iota('1', '9' + 1) ) {
         retval.at(idx) = {
           {row, col},
@@ -63,7 +61,6 @@ auto Sudoku::solve(
   std::add_pointer_t<std::size_t(Sudoku&)> optimization_callback) noexcept
   -> std::size_t
 {
-  using namespace supl::literals::size_t_literal;
   std::size_t assignment_count {};
 
   constexpr static std::size_t max_depth {50};
@@ -152,9 +149,9 @@ auto Sudoku::solve(
       careful_pop();
     }
 
-    std::cout << new_states.size()
-              << " New States: " << supl::stream_adapter {new_states}
-              << '\n';
+    /* std::cout << new_states.size() */
+    /*           << " New States: " << supl::stream_adapter {new_states} */
+    /*           << '\n'; */
 
     std::cout << "Expanded from: " << frontier.top().sudoku << '\n';
     std::cout << "Assignments: " << assignment_count << '\n';
