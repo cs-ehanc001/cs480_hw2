@@ -168,6 +168,10 @@ auto Sudoku::solve(
                           });
   }
 
-  assert(this->is_solved());
+  if ( ! this->is_solved() ) {
+    std::cerr << "No solution found!\n";
+    std::exit(EXIT_FAILURE);
+  }
+
   return assignment_count;
 }
