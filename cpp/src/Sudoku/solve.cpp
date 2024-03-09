@@ -2,10 +2,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdlib>
-#include <deque>
-#include <iterator>
 #include <ranges>
-#include <stack>
 #include <type_traits>
 #include <vector>
 
