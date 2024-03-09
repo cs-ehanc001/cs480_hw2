@@ -68,19 +68,13 @@ auto Sudoku::solve(
 
   const std::vector<Assignment> possible_assignments {
     [&first_unassigned_variable]() -> std::vector<Assignment> {
-      std::cout << "Domain: " << first_unassigned_variable << '\n';
-
       std::vector<Assignment> retval {};
 
       for ( const unsigned long bit : std::views::iota(0UL, 9UL) ) {
 
         if ( first_unassigned_variable.legal_assignments.test(bit) ) {
 
-          std::cout << "Bit " << bit << " is first set" << '\n';
-
           const char value {static_cast<char>(bit + '0' + 1)};
-
-          std::cout << "Value: " << value << '\n';
 
           assert(value >= '1');
           assert(value <= '9');
@@ -92,14 +86,9 @@ auto Sudoku::solve(
       return retval;
     }()};  // Immediately Invoked Lambda Expression
 
-  std::cout << "Possible assignments: "
-            << supl::stream_adapter {possible_assignments} << '\n';
-
   for ( const Assignment& assignment : possible_assignments ) {
     Sudoku next {this->assign_copy(assignment)};
     ++assignment_count;
-
-    std::cout << "Next: " << next << '\n';
 
     if ( next.is_solved() ) {  // yay!
       *this = next;
