@@ -12,6 +12,11 @@ The name of the resulting executable is `sudoku_solver`.
 
 If desired, unit tests can be run with the command: `cmake --build . --target test`
 
+This project is tested using GCC 11, using libstdc++-11.
+Older versions of GCC *will* fail to build the project.
+This project only supports building with GCC 11 or later or with Clang 16 or later, both with libstdc++-11 or later.
+This project is entirely untested with MSVC or with Microsoft's standard library.
+
 ## Running Instructions
 
 The program takes two arguments: the search strategy, and the path to an input file.
