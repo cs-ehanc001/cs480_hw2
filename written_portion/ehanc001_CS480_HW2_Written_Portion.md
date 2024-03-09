@@ -59,4 +59,8 @@ $$
     \mathrm{if} \; C_{ab} \in S_{ij} \land C_{cd} \in S_{ij}, \; \mathrm{then} \; C_{ab} \neq C_{cd}
 $$
 
+---
+
 \break
+
+
