@@ -1,13 +1,12 @@
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <cstddef>
 #include <cstdlib>
 #include <ranges>
 #include <type_traits>
+#include <utility>
 #include <vector>
-
-#include <supl/predicates.hpp>
-#include <supl/utility.hpp>
 
 #include "sudoku.hpp"
 

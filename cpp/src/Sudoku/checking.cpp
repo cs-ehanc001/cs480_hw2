@@ -1,10 +1,12 @@
+#include <algorithm>
 #include <array>
 #include <bitset>
 #include <cassert>
-#include <cstddef>
 #include <ranges>
 
 #include <supl/utility.hpp>
+
+#include <mdspan/mdspan.hpp>
 
 #include "section_table.hpp"
 #include "sudoku.hpp"
@@ -217,7 +219,7 @@ auto Sudoku::query_domains() const noexcept
   -> std::array<variable_domain, 81>
 {
   std::array<variable_domain, 81> domains;
-  Kokkos::mdspan<variable_domain, Kokkos::extents<unsigned, 9, 9>>
+  const Kokkos::mdspan<variable_domain, Kokkos::extents<unsigned, 9, 9>>
     domain_view {domains.data()};
 
   const auto board_view {this->mdview()};

@@ -2,8 +2,6 @@
 #include <cassert>
 #include <cmath>
 
-#include <supl/utility.hpp>
-
 #include "sudoku.hpp"
 
 // applies exactly one trivial move (only one possible value)
