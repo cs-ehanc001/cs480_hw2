@@ -14,6 +14,8 @@
 
 #include "sudoku.hpp"
 
+template std::string supl::to_string<Sudoku>(const Sudoku&);
+
 auto null_optimization(Sudoku&) -> std::size_t
 {
   return 0;
@@ -114,4 +116,6 @@ auto Sudoku::solve(
       return {assignment_count, true};
     }
   }
+
+  return {assignment_count, false};
 }
