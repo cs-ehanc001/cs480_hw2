@@ -36,7 +36,7 @@ Below is the "easy" problem from the homework document in the appropriate format
 
 The directory `inputs` contains the "easy," "medium," "hard," and "evil"
 puzzles from the homework document, along with one extra example.
-"trivial", "extra_trivial", "already_solved", and "impossible" puzzles are also included, however exist primarily for testing purposes.
+Some more examples are also included in the `more_examples` subdirectory, however exist primarily for testing purposes.
 "impossible" is genuinely impossible. Failure to solve it is expected behavior.
 
 ```
