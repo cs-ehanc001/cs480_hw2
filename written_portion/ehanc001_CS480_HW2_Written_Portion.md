@@ -63,4 +63,61 @@ $$
 
 \break
 
+# Task 4
 
+Specific performance data is made available in a couple of formats as `data.csv`, `data.json`, and `data.pdf` (generated from `data.md`). This performance data was collected using [hyperfine (link)](https://github.com/sharkdp/hyperfine) version 1.18.0, a rather nice CLI benchmarking tool, using a sample size of $20,000$ runs for each command.
+The JSON data may be visualized using some scripts available on the hyperfine repository, however, I did not see much value in that.
+The data set is included for completeness.
+As for system information as a reference, the system on which these benchmarks were performed was an Intel i7-10870H running 64-bit GNU Linux (specifically an Ubuntu 22.04 derivative).
+
+The program is fairly deterministic, directly using no random number generation.
+Thus the primary source of variation between runs of the same command would be the presence of other processes on the system.
+
+As backed up by the data, the smart backtracking algorithm outperformed the simple backtracking algorithm for each puzzle.
+Most notably, for the "evil" puzzle, the smart backtracking algorithm outperformed the simple backtracking algorithm by an order of magnitude.
+
+To analyze the performance improvement for each puzzle, the speedup between the simple and smart backtracking algorithms will be computed as described below:
+
+Let:
+
+$$
+P = \text{mean execution time of simple algorithm}
+$$
+
+$$
+S = \text{mean execution time of smart algorithm}
+$$
+
+$$
+D = \text{\% decrease} = 100 \cdot \frac{P - S}{P}
+$$
+
+| Puzzle | Simple Mean Time (ms) | Smart Mean Time (ms) | Speedup |
+| :--    | :--                   | :--                  | :--     |
+| Easy   | 3.7                   | 3.0                  | 18.9\%  |
+| Medium | 4.4                   | 3.3                  | 25.0\%  |
+| Hard   | 4.5                   | 3.5                  | 22.2\%  |
+| Evil   | 41.6                  | 7.1                  | 82.9\%  |
+
+---
+
+\break
+
+The simple backtracking algorithm is a pure guess-and-check approach.
+The first unassigned variable is selected, and is assigned the first value which does not violate any constraints.
+This process is repeated until an unsatisfiable state is reached.
+At that point, the algorithm backtracks, undoing the last assignment, and trying the next value for that variable.
+If all possible values for any variable are exhausted, the algorithm backtracks again.
+Theoretically, this should solve any solvable Sudoku, as it will essentially perform a depth-first search of the entire set of possible assignments.
+This algorithm, while correct, is unoptimized.
+
+The smart algorithm performs its search in the exact same way, but before each guess will perform all assignments to variables whose domain has been constrained to a single value.
+This assignment to the most constrained variables is a simple first step humans will use when solving Sudoku puzzles.
+If 1, 4, 5, and 8 appear on the same row, 2, 3, and 7 appear on the same column, and 6 appears in the same 3x3 section, then that cell must contain a 9.
+
+These most-constrained variables are determined and are assigned their values repeatedly until a none such variables remain.
+At that point, the algorithm will perform one guess as described above, and will then check again for most-constrained variables.
+When backtracking, the smart algorithm will backtrack to the last guess made, skipping the forced variable assignments.
+
+This improvement greatly reduces guessing, and significantly reduces the search space.
+The "trivial" puzzle which is also included in the input data is a puzzle with can be solved purely by assigning most-constrained variables with no guesses made.
